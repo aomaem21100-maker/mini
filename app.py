@@ -157,11 +157,6 @@ div[data-testid="stExpander"] > details > summary {
     font-weight: 500;
 }
 
-/* Spinner animation */
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
 /* Fade in animation */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
@@ -198,26 +193,6 @@ div[data-testid="stVerticalBlockBorderWrapper"] {
     font-weight: 600;
     display: inline-block;
     box-shadow: 0 4px 15px rgba(107, 203, 119, 0.3);
-}
-
-/* Icon indicators */
-.icon-badge {
-    display: inline-block;
-    padding: 0.3rem 0.8rem;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    margin-right: 0.5rem;
-}
-
-/* Model cards */
-.model-card {
-    background: linear-gradient(135deg, #FFFFFF 0%, #F8F8FD 100%);
-    border-radius: 16px;
-    padding: 1rem 1.2rem;
-    margin-bottom: 0.8rem;
-    border-left: 4px solid #6C63FF;
-    box-shadow: 0 2px 10px rgba(90, 90, 160, 0.05);
 }
 
 /* Header accent line */
@@ -315,7 +290,7 @@ with h1:
 with h2:
     with st.container(border=True):
         if os.path.exists("my_photo.jpg"):
-            st.image("my_photo.jpg", use_column_width=True)
+            st.image("my_photo.jpg", use_container_width=True)
         st.markdown("**รหัส:** 63xxxxxxxx  \n**ชื่อ-นามสกุล:** ……………  \n**หมู่เรียน:** ……")
 
 # ==================== METRICS (ชิดซ้าย) ====================
@@ -394,14 +369,14 @@ with t4:
     if os.path.exists("compare.png"):
         with i1:
             with st.container(border=True):
-                st.image("compare.png", caption="กราฟเปรียบเทียบ Performance", use_column_width=True)
+                st.image("compare.png", caption="กราฟเปรียบเทียบ Performance", use_container_width=True)
     if os.path.exists("cm.png"):
         with i2:
             with st.container(border=True):
-                st.image("cm.png", caption="Confusion Matrix (3×3)", use_column_width=True)
+                st.image("cm.png", caption="Confusion Matrix (3×3)", use_container_width=True)
     if os.path.exists("roc.png"):
         with st.container(border=True):
-            st.image("roc.png", caption="ROC Curve (One-vs-Rest)", use_column_width=True)
+            st.image("roc.png", caption="ROC Curve (One-vs-Rest)", use_container_width=True)
 
 with t5:
     with st.container(border=True):
