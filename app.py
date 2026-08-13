@@ -13,196 +13,88 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.base import BaseEstimator, TransformerMixin
 
-st.set_page_config(page_title="Drug Side Effects Dashboard", page_icon="💊", layout="wide")
+st.set_page_config(page_title="ระบบวิเคราะห์ผลข้างเคียงของยา", page_icon="💊", layout="wide")
 st.session_state.setdefault("models", None)
 
-# ==================== PREMIUM THEME #E0E0F3 (Enhanced) ====================
+# ==================== FORMAL THEME (Sarabun + Navy on #E0E0F3) ====================
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap');
 
-/* Base */
-html, body, [class*="css"] { font-family:'Prompt',sans-serif; }
-div[data-testid="stAppViewContainer"], section.main, .stApp { 
-    background: linear-gradient(135deg, #E0E0F3 0%, #D5D5EB 100%);
-}
+/* ---------- พื้นฐาน ---------- */
+html, body, [class*="css"] { font-family:'Sarabun',sans-serif; }
+div[data-testid="stAppViewContainer"], section.main, .stApp { background:#E0E0F3; }
 #MainMenu, header, footer { visibility:hidden; }
-h1,h2,h3,h4,p,span,li { color:#33335A; }
+h1,h2,h3,h4,p,span,li { color:#1F2430; }
+h1 { font-weight:700; color:#16204D; }
+h2,h3 { font-weight:600; color:#16204D; }
 
-/* Typography enhancements */
-h1 { font-weight:700; letter-spacing:-0.5px; }
-h2 { font-weight:600; letter-spacing:-0.3px; }
-h3 { font-weight:600; }
-
-/* Card base with glass morphism */
+/* ---------- การ์ดเนื้อหา ---------- */
 div[data-testid="stVerticalBlockBorderWrapper"] {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 24px;
-    box-shadow: 0 8px 32px rgba(90, 90, 160, 0.08);
-    transition: all 0.3s ease;
-}
-div[data-testid="stVerticalBlockBorderWrapper"]:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 40px rgba(90, 90, 160, 0.12);
+    background:#FFFFFF;
+    border:1px solid #D5D5E6;
+    border-radius:10px;
+    box-shadow:0 1px 3px rgba(20,25,60,.06);
 }
 
-/* Metric cards premium */
+/* ---------- การ์ดตัวชี้วัด (KPI) ---------- */
 div[data-testid="stMetric"] {
-    background: linear-gradient(135deg, #FFFFFF 0%, #F8F8FD 100%);
-    border-radius: 20px;
-    padding: 1.2rem 1.5rem;
-    box-shadow: 0 4px 20px rgba(90, 90, 160, 0.08);
-    border: 1px solid rgba(108, 99, 255, 0.1);
-    transition: all 0.3s ease;
+    background:#FFFFFF;
+    border:1px solid #D5D5E6;
+    border-left:4px solid #1F2A63;
+    border-radius:8px;
+    padding:1rem 1.2rem;
+    box-shadow:none;
 }
-div[data-testid="stMetric"]:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 30px rgba(108, 99, 255, 0.15);
-    border-color: rgba(108, 99, 255, 0.3);
-}
-div[data-testid="stMetric"] label { 
-    color:#6E6E93 !important; 
-    font-weight:600; 
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-div[data-testid="stMetric"] div[data-testid="stMetricValue"] {
-    font-weight: 700;
-    color: #33335A;
-    font-size: 1.8rem;
-}
+div[data-testid="stMetric"] label { color:#5A6178 !important; font-weight:600; font-size:.85rem; }
+div[data-testid="stMetric"] div[data-testid="stMetricValue"] { color:#16204D; font-weight:700; }
 
-/* Tabs pill style with gradient */
-div[data-testid="stTabs"] ul { gap:.5rem; padding: 0.3rem; background: rgba(255,255,255,0.5); border-radius: 999px; }
-div[data-testid="stTabs"] button { 
-    background:transparent; 
-    color:#6E6E93; 
-    border-radius:999px; 
-    font-weight:500;
-    padding: 0.5rem 1.2rem;
-    transition: all 0.3s ease;
+/* ---------- Tabs แบบเส้นล่าง (ทางการ) ---------- */
+div[data-testid="stTabs"] ul { gap:0; padding:0; background:transparent; border-radius:0; border-bottom:1px solid #C6C6DA; }
+div[data-testid="stTabs"] button {
+    background:transparent; color:#4A4A68; border-radius:0;
+    font-weight:500; padding:.6rem 1.3rem;
 }
-div[data-testid="stTabs"] button[aria-selected="true"] { 
-    background: linear-gradient(135deg, #6C63FF 0%, #574FE0 100%);
-    color:#fff;
-    box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3);
+div[data-testid="stTabs"] button[aria-selected="true"] {
+    background:transparent; color:#1F2A63; font-weight:700;
+    border-bottom:3px solid #1F2A63; box-shadow:none;
 }
-div[data-testid="stTabs"] button:hover { 
-    color:#6C63FF;
-    transform: translateY(-1px);
-}
+div[data-testid="stTabs"] button:hover { color:#1F2A63; }
 
-/* Primary button with gradient */
+/* ---------- ปุ่ม ---------- */
 div.stButton > button {
-    background: linear-gradient(135deg, #6C63FF 0%, #574FE0 100%);
-    color:#fff; 
-    border:none; 
-    border-radius:14px;
-    font-weight:600; 
-    padding:.6rem 2.5rem;
-    box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3);
-    transition: all 0.3s ease;
+    background:#1F2A63; color:#FFFFFF; border:none; border-radius:8px;
+    font-weight:600; padding:.55rem 2rem; box-shadow:none;
 }
-div.stButton > button:hover { 
-    background: linear-gradient(135deg, #574FE0 0%, #4A3FD0 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(108, 99, 255, 0.4);
-}
-div.stButton > button:active {
-    transform: translateY(0);
-}
+div.stButton > button:hover { background:#16204D; }
 
-/* Input fields */
-input, textarea { 
-    border-radius:12px !important; 
-    border:2px solid rgba(108, 99, 255, 0.15) !important;
-    transition: all 0.3s ease !important;
-}
-input:focus, textarea:focus {
-    border-color: rgba(108, 99, 255, 0.5) !important;
-    box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.1) !important;
-}
-div[data-baseweb="select"] > div { 
-    border-radius:12px !important; 
-    border:2px solid rgba(108, 99, 255, 0.15) !important;
-}
+/* ---------- ช่องกรอก ---------- */
+input, textarea { border-radius:8px !important; border:1px solid #C6C6DA !important; }
+div[data-baseweb="select"] > div { border-radius:8px !important; border:1px solid #C6C6DA !important; }
 
-/* Alerts */
-div[data-testid="stAlert"] { 
-    border-radius:16px;
-    border: 1px solid rgba(108, 99, 255, 0.2);
-}
+/* ---------- แถบความคืบหน้า ---------- */
+div[data-testid="stProgress"] > div { background:#E4E4F0; border-radius:6px; }
+div[data-testid="stProgress"] > div > div { background:#1F2A63; border-radius:6px; }
 
-/* Progress bar custom */
-div[data-testid="stProgress"] > div {
-    background: rgba(108, 99, 255, 0.1);
-    border-radius: 10px;
-}
-div[data-testid="stProgress"] > div > div {
-    background: linear-gradient(90deg, #6C63FF 0%, #574FE0 100%);
-    border-radius: 10px;
-}
+/* ---------- ส่วนขยาย ---------- */
+div[data-testid="stExpander"] { border-radius:8px; background:#FAFAFE; border:1px solid #D5D5E6; }
 
-/* Expander */
-div[data-testid="stExpander"] {
-    border-radius: 16px;
-    background: rgba(255, 255, 255, 0.7);
-    border: 1px solid rgba(108, 99, 255, 0.1);
+/* ---------- ป้ายระดับความเสี่ยง (โทนสุภาพ) ---------- */
+.risk-high, .risk-moderate, .risk-low {
+    padding:.55rem 1rem; border-radius:8px; font-weight:600; display:inline-block;
 }
-div[data-testid="stExpander"] > details > summary {
-    padding: 0.8rem 1.2rem;
-    font-weight: 500;
-}
+.risk-high     { background:#FDECEA; color:#B3261E; border:1px solid #F2C4BE; }
+.risk-moderate { background:#FFF8E1; color:#8D6E00; border:1px solid #EBDCA6; }
+.risk-low      { background:#E8F5E9; color:#2E7D32; border:1px solid #BFE0C3; }
 
-/* Fade in animation */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+/* ---------- องค์ประกอบหัวเรื่อง ---------- */
+.tag-project {
+    display:inline-block; background:#1F2A63; color:#FFFFFF;
+    font-size:.72rem; letter-spacing:2px; padding:.3rem .8rem; border-radius:4px;
 }
-div[data-testid="stVerticalBlockBorderWrapper"] {
-    animation: fadeIn 0.5s ease-out;
-}
-
-/* Risk level indicators */
-.risk-high {
-    background: linear-gradient(135deg, #FF6B6B 0%, #EE5A52 100%);
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 12px;
-    font-weight: 600;
-    display: inline-block;
-    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
-}
-.risk-moderate {
-    background: linear-gradient(135deg, #FFD93D 0%, #F6C90E 100%);
-    color: #333;
-    padding: 0.5rem 1rem;
-    border-radius: 12px;
-    font-weight: 600;
-    display: inline-block;
-    box-shadow: 0 4px 15px rgba(255, 217, 61, 0.3);
-}
-.risk-low {
-    background: linear-gradient(135deg, #6BCB77 0%, #4CAF50 100%);
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 12px;
-    font-weight: 600;
-    display: inline-block;
-    box-shadow: 0 4px 15px rgba(107, 203, 119, 0.3);
-}
-
-/* Header accent line */
-.header-accent {
-    width: 60px;
-    height: 4px;
-    background: linear-gradient(90deg, #6C63FF 0%, #574FE0 100%);
-    border-radius: 2px;
-    margin-bottom: 1rem;
-}
+.header-line { width:64px; height:3px; background:#1F2A63; margin:.6rem 0 1rem 0; }
+.info-table td { padding:.15rem 0; color:#1F2430; }
+.info-table td:first-child { color:#5A6178; padding-right:.8rem; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -281,132 +173,122 @@ def build_models():
 comp = pd.read_csv("model_comparison.csv") if os.path.exists("model_comparison.csv") else None
 best = comp.sort_values("Accuracy", ascending=False).iloc[0] if comp is not None else None
 
-# ==================== HEADER ====================
+# ==================== ส่วนหัวโครงการ ====================
+st.markdown('<span class="tag-project">MACHINE LEARNING PROJECT</span>', unsafe_allow_html=True)
 h1, h2 = st.columns([3, 1], gap="large")
 with h1:
-    st.markdown('<div class="header-accent"></div>', unsafe_allow_html=True)
-    st.title("💊 Drug Side Effects Dashboard")
-    st.caption("ระบบวิเคราะห์รีวิวผู้ป่วยเพื่อจำแนกระดับผลข้างเคียงยาด้วย Machine Learning")
+    st.title("ระบบวิเคราะห์ผลข้างเคียงของยา")
+    st.markdown('<div class="header-line"></div>', unsafe_allow_html=True)
+    st.caption("การจำแนกระดับผลข้างเคียงจากข้อความรีวิวผู้ป่วยด้วยเทคนิคการเรียนรู้ของเครื่อง")
 with h2:
     with st.container(border=True):
         if os.path.exists("my_photo.jpg"):
             st.image("my_photo.jpg", use_container_width=True)
-        st.markdown("**รหัส:** 63xxxxxxxx  \n**ชื่อ-นามสกุล:** ……………  \n**หมู่เรียน:** ……")
+        st.markdown("""
+        <table class="info-table">
+          <tr><td>รหัสนักศึกษา</td><td>63xxxxxxxx</td></tr>
+          <tr><td>ชื่อ-นามสกุล</td><td>……………</td></tr>
+          <tr><td>หมู่เรียน</td><td>……</td></tr>
+        </table>
+        """, unsafe_allow_html=True)
 
-# ==================== METRICS (ชิดซ้าย) ====================
+# ==================== ตัวชี้วัดโครงการ ====================
 m1, m2, m3, m4, _ = st.columns([1, 1, 1, 1, 1.6], gap="medium")
-m1.metric("ข้อมูลรีวิว", "3,000 รายการ")
-m2.metric("ฟีเจอร์", "TF-IDF 300 + 2 numeric")
+m1.metric("ขนาดข้อมูล", "3,000 รายการ")
+m2.metric("คุณลักษณะ", "TF-IDF 300 + 2 ตัวเลข")
 m3.metric("โมเดลที่ดีที่สุด", best["Model"] if best is not None else "–")
-m4.metric("Accuracy สูงสุด", f"{best['Accuracy']:.2%}" if best is not None else "–")
+m4.metric("ความถูกต้องสูงสุด", f"{best['Accuracy']:.2%}" if best is not None else "–")
 
 st.markdown("")
 
-# ==================== TABS ====================
-t1, t2, t3, t4, t5 = st.tabs(["📌 ปัญหา", "🧹 Preprocessing", "🤖 โมเดล", "📊 ประเมินผล", "🔮 วิเคราะห์รีวิว"])
+# ==================== เนื้อหา 5 ส่วนตามโจทย์ ====================
+t1, t2, t3, t4, t5 = st.tabs(["1. ปัญหาและข้อมูล", "2. Preprocessing", "3. โมเดล", "4. การประเมินผล", "5. ทดลองวิเคราะห์"])
 
 with t1:
     with st.container(border=True):
-        st.markdown('<div class="header-accent"></div>', unsafe_allow_html=True)
-        st.subheader("การกำหนดปัญหา")
-        st.write("ผู้ป่วยรีวิวผลข้างเคียงยาไว้ในเว็บ แต่ข้อมูลกระจัดกระจาย → ใช้ ML วิเคราะห์รีวิวเพื่อจำแนกระดับความเสี่ยง (สูง/กลาง/ต่ำ) ช่วยให้แพทย์คัดกรองยาที่ต้องระวังได้เร็วขึ้น")
+        st.subheader("1.1 การกำหนดปัญหา")
+        st.write("ผู้ป่วยที่รับประทานยามักบันทึกประสบการณ์และผลข้างเคียงไว้ในช่องทางออนไลน์ "
+                   "แต่ข้อมูลมีปริมาณมากและกระจัดกระจาย งานนี้จึงพัฒนาโมเดลการเรียนรู้ของเครื่องเพื่อจำแนกระดับ"
+                   "ผลข้างเคียง (รุนแรง / ปานกลาง / น้อย) จากข้อความรีวิวอัตโนมัติ "
+                   "เพื่อสนับสนุนการคัดกรองความปลอดภัยของการใช้ยา")
     with st.container(border=True):
-        st.markdown('<div class="header-accent"></div>', unsafe_allow_html=True)
-        st.subheader("Dataset : Drug Review (จำลอง)")
-        st.write("3,000 รีวิวจำลอง • ฟีเจอร์: ชื่อยา, สภาพโรค, รีวิวข้อความ, usefulCount, rating")
-        st.dataframe(make_data(20)[["drugName", "condition", "review", "usefulCount", "rating", "side_effect_level"]],
+        st.subheader("1.2 ชุดข้อมูล (Drug Review Dataset)")
+        st.write("ข้อมูลรีวิวผู้ป่วยจำลอง 3,000 รายการ ประกอบด้วย ชื่อยา สภาพโรค ข้อความรีวิว "
+                   "จำนวนผู้พบว่ารีวิวมีประโยชน์ (usefulCount) และคะแนนความพึงพอใจ (rating 1–10)")
+        st.dataframe(make_data(10)[["drugName", "condition", "review", "usefulCount", "rating", "side_effect_level"]],
                      use_container_width=True, hide_index=True)
 
 with t2:
     with st.container(border=True):
-        st.markdown('<div class="header-accent"></div>', unsafe_allow_html=True)
-        st.subheader("ขั้นตอน Data Preprocessing")
+        st.subheader("2.1 ขั้นตอนการเตรียมข้อมูล")
         st.markdown("""
-        **1. สร้างข้อมูลจำลอง** — 3,000 แถว (10 ยา × 10 โรค × 15 รีวิว)
-        
-        **2. ทำความสะอาดข้อความ** — ลบ HTML tags, แปลงเป็น lowercase, ลบสัญลักษณ์พิเศษ
-        
-        **3. สร้างตัวแปรเป้าหมาย** — แปลง rating (1–10) → side_effect_level (high/moderate/low)
-        
-        **4. TF-IDF Vectorizer** — แปลงข้อความเป็นเวกเตอร์ 300 มิติ
-        
-        **5. StandardScaler** — ปรับสเกลฟีเจอร์ตัวเลข (usefulCount + review_len)
-        
-        **6. Split ข้อมูล** — Train/Test = 80/20 แบบ Stratified
+        1. **การสร้างและคัดเลือกข้อมูล** — สุ่มตัวอย่างรีวิว 3,000 รายการแบบ Stratified
+        2. **การทำความสะอาดข้อความ** — ตัดแท็ก HTML แปลงเป็นตัวพิมพ์เล็ก และลบอักขระพิเศษ
+        3. **การกำหนดตัวแปรเป้าหมาย** — แปลงคะแนน rating เป็น 3 ระดับ ได้แก่ high / moderate / low
+        4. **การแปลงข้อความเป็นคุณลักษณะ** — ใช้ TF-IDF Vectorizer (300 มิติ)
+        5. **การปรับมาตราส่วน** — ใช้ StandardScaler กับคุณลักษณะตัวเลข
+        6. **การแบ่งข้อมูล** — ชุดฝึกและชุดทดสอบ อัตราส่วน 80:20
         """)
 
 with t3:
-    st.markdown('<div class="header-accent"></div>', unsafe_allow_html=True)
-    st.subheader("โมเดล Machine Learning ที่ใช้")
-    
-    col1, col2 = st.columns(2, gap="medium")
-    with col1:
+    st.subheader("3.1 โมเดลที่ใช้ในการศึกษา")
+    c1, c2 = st.columns(2, gap="medium")
+    with c1:
         with st.container(border=True):
-            st.markdown("#### 🎯 Logistic Regression")
-            st.markdown("Multinomial logistic regression + TF-IDF features  \nเหมาะกับข้อความขนาดใหญ่ คำนวณเร็ว")
-    with col2:
+            st.markdown("**Logistic Regression**  \nแบบจำลองเชิงเส้นที่ใช้ฟังก์ชัน Sigmoid ประมาณความน่าจะเป็นของแต่ละคลาส เหมาะสำหรับข้อมูลข้อความมิติสูง")
         with st.container(border=True):
-            st.markdown("#### 🌳 Decision Tree")
-            st.markdown("แบ่งกิ่งด้วย Gini impurity  \nตีความง่าย แต่ overfit ได้ง่ายกับ sparse features")
-    
-    with col1:
+            st.markdown("**Random Forest**  \nวิธี Ensemble แบบ Bagging ที่สร้าง Decision Tree จำนวนมากและรวมผลด้วยการโหวต เพื่อลดความแปรปรวนของแบบจำลอง")
+    with c2:
         with st.container(border=True):
-            st.markdown("#### 🌲 Random Forest")
-            st.markdown("Bagging หลายต้นแล้วโหวต  \nลด variance เหมาะกับข้อมูล imbalance")
-    with col2:
+            st.markdown("**Decision Tree**  \nแบ่งข้อมูลเป็นกิ่งตามค่าที่ลดความไม่บริสุทธิ์ (Gini Impurity) ลง ตีความผลลัพธ์ได้ง่าย")
         with st.container(border=True):
-            st.markdown("#### 👥 K-NN")
-            st.markdown("โหวตจาก k เพื่อนบ้านใกล้สุด  \nต้อง scaling ก่อน (TF-IDF + numeric)")
+            st.markdown("**K-Nearest Neighbors (K-NN)**  \nจำแนกคลาสจากเพื่อนบ้านที่ใกล้ที่สุด k รายด้วยระยะทางแบบยุคลิด จำเป็นต้องปรับมาตราส่วนข้อมูลล่วงหน้า")
 
 with t4:
     if comp is not None:
         with st.container(border=True):
-            st.markdown('<div class="header-accent"></div>', unsafe_allow_html=True)
-            st.subheader("ตารางเปรียบเทียบโมเดล")
+            st.subheader("4.1 ตารางเปรียบเทียบประสิทธิภาพโมเดล")
             st.dataframe(comp, use_container_width=True, hide_index=True)
-    
     i1, i2 = st.columns(2, gap="medium")
     if os.path.exists("compare.png"):
         with i1:
             with st.container(border=True):
-                st.image("compare.png", caption="กราฟเปรียบเทียบ Performance", use_container_width=True)
+                st.image("compare.png", caption="ภาพที่ 1: การเปรียบเทียบประสิทธิภาพของโมเดล", use_container_width=True)
     if os.path.exists("cm.png"):
         with i2:
             with st.container(border=True):
-                st.image("cm.png", caption="Confusion Matrix (3×3)", use_container_width=True)
+                st.image("cm.png", caption="ภาพที่ 2: Confusion Matrix ของโมเดลที่ดีที่สุด", use_container_width=True)
     if os.path.exists("roc.png"):
         with st.container(border=True):
-            st.image("roc.png", caption="ROC Curve (One-vs-Rest)", use_container_width=True)
+            st.image("roc.png", caption="ภาพที่ 3: เส้นโค้ง ROC (One-vs-Rest)", use_container_width=True)
 
 with t5:
     with st.container(border=True):
-        st.markdown('<div class="header-accent"></div>', unsafe_allow_html=True)
-        st.subheader("ทดลองวิเคราะห์รีวิว")
-        
+        st.subheader("5.1 ทดลองวิเคราะห์รีวิว")
         if st.session_state.models is None:
-            st.info("⏳ โมเดลยังไม่ถูกเทรน — กดปุ่มด้านล่างเพื่อเริ่ม (ใช้เวลาประมาณ 10–20 วินาที)")
-            if st.button("🚀 เริ่มเทรนโมเดล", use_container_width=True):
+            st.info("โมเดลยังไม่ถูกฝึก — กดปุ่มด้านล่างเพื่อเริ่มต้น (ใช้เวลาประมาณ 10–20 วินาที)")
+            if st.button("เริ่มต้นฝึกโมเดล", use_container_width=True):
                 try:
-                    with st.spinner("กำลังสร้างข้อมูลและเทรน 4 โมเดล..."):
+                    with st.spinner("กำลังสร้างข้อมูลและฝึกโมเดลทั้ง 4 รูปแบบ..."):
                         st.session_state.models = build_models()
                     st.rerun()
                 except Exception as e:
-                    st.error(f"เทรนไม่สำเร็จ: {e}")
+                    st.error(f"ไม่สามารถฝึกโมเดลได้: {e}")
         else:
             models = st.session_state.models
-            model_name = st.selectbox("เลือกโมเดลที่ต้องการใช้", list(models.keys()), index=2)
-            
-            col1, col2 = st.columns(2, gap="medium")
-            with col1:
-                drug = st.text_input("💊 ชื่อยา (เช่น Metformin)", "Metformin")
-                condition = st.text_input("🏥 สภาพโรค (เช่น Diabetes)", "Diabetes")
-            with col2:
-                review = st.text_area("📝 พิมพ์รีวิวผู้ป่วย (ภาษาอังกฤษ)",
-                                      "This drug caused severe nausea and dizziness. I could not continue.",
-                                      height=120)
-                useful = st.number_input("👍 จำนวน usefulCount", 0, 1000, value=50)
+            model_name = st.selectbox("เลือกโมเดล", list(models.keys()), index=2)
 
-            if st.button("🔮 วิเคราะห์ผล", use_container_width=True):
+            c1, c2 = st.columns(2, gap="medium")
+            with c1:
+                drug = st.text_input("ชื่อยา", "Metformin")
+                condition = st.text_input("สภาพโรค", "Diabetes")
+                useful = st.number_input("จำนวน usefulCount", 0, 1000, value=50)
+            with c2:
+                review = st.text_area("ข้อความรีวิว (ภาษาอังกฤษ)",
+                                      "This drug caused severe nausea and dizziness. I could not continue.",
+                                      height=140)
+
+            if st.button("วิเคราะห์ผล", use_container_width=True):
                 inp = pd.DataFrame([{
                     "clean_review": clean_text(review),
                     "usefulCount": useful,
@@ -419,18 +301,20 @@ with t5:
                 idx = classes.index(pred)
 
                 level_map = {
-                    "high": ("🔴 ผลข้างเคียงรุนแรง", "risk-high"),
-                    "moderate": ("🟡 ผลข้างเคียงปานกลาง", "risk-moderate"),
-                    "low": ("🟢 ผลข้างเคียงน้อย", "risk-low")
+                    "high": ("ระดับรุนแรง (High)", "risk-high"),
+                    "moderate": ("ระดับปานกลาง (Moderate)", "risk-moderate"),
+                    "low": ("ระดับน้อย (Low)", "risk-low"),
                 }
-                
-                label, css_class = level_map.get(pred, (pred, ""))
-                st.markdown(f'<div class="{css_class}">{label}</div>', unsafe_allow_html=True)
-                
-                st.write(f"**ความมั่นใจ:** {proba[idx]:.1%}")
+                label, css = level_map.get(pred, (pred, "risk-low"))
+                st.markdown(f"**ผลการวิเคราะห์:** &nbsp; <span class='{css}'>{label}</span>", unsafe_allow_html=True)
+                st.write(f"ความเชื่อมั่นของโมเดล: **{proba[idx]:.1%}**")
                 st.progress(float(proba[idx]))
-                
-                with st.expander("📊 ดูความน่าจะเป็นทุกคลาส"):
+
+                with st.expander("ดูความน่าจะเป็นรายคลาส"):
                     for cls, p in sorted(zip(classes, proba * 100), key=lambda x: -x[1]):
-                        label_cls, _ = level_map.get(cls, (cls, ""))
-                        st.write(f"- {label_cls}: **{p:.1f}%**")
+                        l, _ = level_map.get(cls, (cls, ""))
+                        st.write(f"- {l}: {p:.1f}%")
+
+# ==================== ส่วนท้าย ====================
+st.markdown("---")
+st.caption("จัดทำเพื่อประกอบการเรียนวิชา Machine Learning • ปีการศึกษา 2568 • พัฒนาด้วย Python, scikit-learn และ Streamlit")
