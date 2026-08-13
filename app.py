@@ -358,18 +358,22 @@ with t5:
                 v2 = st.number_input("V2 (PCA)", -50.0, 50.0, value=0.0)
 
             if st.button("🔍 ตรวจจับธุรกรรม", use_container_width=True):
-                features = np.zeros(30)
-                features[0] = v1
-                features[1] = v2
-
-                # ✅ แก้ ValueError: ส่งทั้ง 2 คอลัมน์พร้อมกันให้ตรงกับตอนฝึก scaler
+                # ✅ สร้าง Dictionary เพื่อจับคู่ชื่อคอลัมน์กับค่าให้ชัดเจน
+                inp_dict = {f"V{i}": 0.0 for i in range(1, 29)}
+                inp_dict["V1"] = float(v1)
+                inp_dict["V2"] = float(v2)
+                
+                # Scale Amount และ Time
                 scaled = scaler.transform(
                     pd.DataFrame([[amount, time_val]], columns=["Amount", "Time"])
                 )[0]
-                features[28] = scaled[0]   # Amount
-                features[29] = scaled[1]   # Time
+                inp_dict["Amount"] = float(scaled[0])
+                inp_dict["Time"] = float(scaled[1])
 
-                inp = pd.DataFrame([features], columns=[f"V{i}" for i in range(1, 29)] + ["Amount", "Time"])
+                # ✅ บังคับลำดับคอลัมน์ให้ตรงกับตอนเทรนโมเดลเป๊ะๆ (V1..V28, Time, Amount)
+                train_columns = [f"V{i}" for i in range(1, 29)] + ["Time", "Amount"]
+                inp = pd.DataFrame([inp_dict])[train_columns]
+
                 m = models[model_name]
                 pred = m.predict(inp)[0]
                 proba = m.predict_proba(inp)[0][1]
