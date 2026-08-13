@@ -96,7 +96,6 @@ FALLBACK = {"age": 48.0, "bp": 80.0, "bgr": 100.0, "bu": 36.0,
             "sc": 1.1, "hemo": 12.5, "sod": 138.0, "k": 4.5}
 
 def num_default(col):
-    """ค่ากลางของคอลัมน์ ถ้าไม่มีคอลัมน์นี้/ไม่ใช่ตัวเลข ใช้ค่าทางการแพทย์แทน"""
     if col in X_ref.columns and pd.api.types.is_numeric_dtype(X_ref[col]):
         v = X_ref[col].median()
         if pd.notna(v):
@@ -114,8 +113,8 @@ with h2:
             st.image("my_photo.jpg")
         st.markdown("**รหัส:** 63xxxxxxxx  \n**ชื่อ-นามสกุล:** ……………  \n**หมู่เรียน:** ……")
 
-# ==================== METRICS ====================
-m1, m2, m3, m4 = st.columns(4)
+# ==================== METRICS (จัดชิดซ้าย) ====================
+m1, m2, m3, m4, _ = st.columns([1, 1, 1, 1, 1.6], gap="medium")
 m1.metric("ข้อมูลตัวอย่าง", f"{len(X_ref)} แถว")
 m2.metric("ฟีเจอร์", f"{len(X_ref.columns)} ตัว")
 m3.metric("โมเดลที่ดีที่สุด", best["Model"] if best is not None else "–")
@@ -174,7 +173,6 @@ with t5:
         model_name = st.selectbox("เลือกโมเดล", list(models.keys()), index=2)
         st.caption("กรอกเฉพาะค่าหลัก 8 รายการ — ค่าที่เหลือระบบเติมมัธยฐาน/ฐานนิยมให้อัตโนมัติ")
 
-        # เติมค่าตั้งต้นให้ครบทุกคอลัมน์ที่มีจริง (กันพลาดทุกกรณี)
         user_input = {}
         for c in X_ref.columns:
             if pd.api.types.is_numeric_dtype(X_ref[c]):
