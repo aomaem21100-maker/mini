@@ -18,23 +18,8 @@ st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 
-:root {
-    --bg-main: #E3EBFD;
-    --bg-card: #FFFFFF;
-    --accent: #3B5BDB;
-    --accent-soft: #A5B4FC;
-    --text-dark: #1A1F36;
-    --text-muted: #6B7280;
-    --border: #D1D5DB;
-}
-
-/* Base */
-html, body, [class*="css"] {
-    font-family: 'IBM Plex Sans Thai', 'Inter', sans-serif;
-}
-div[data-testid="stAppViewContainer"], section.main, .stApp {
-    background: #E3EBFD;
-}
+html, body, [class*="css"] { font-family: 'IBM Plex Sans Thai', 'Inter', sans-serif; }
+div[data-testid="stAppViewContainer"], section.main, .stApp { background: #E3EBFD; }
 #MainMenu, header, footer { visibility: hidden; }
 
 h1, h2, h3, h4 { color: #1A1F36; font-weight: 600; letter-spacing: -0.3px; }
@@ -43,107 +28,49 @@ h2 { font-size: 1.35rem; }
 h3 { font-size: 1.1rem; }
 p, li, span { color: #1A1F36; }
 
-/* การ์ดมินิมอล */
 div[data-testid="stVerticalBlockBorderWrapper"] {
-    background: #FFFFFF;
-    border: 1px solid #E5E7EB;
-    border-radius: 16px;
-    box-shadow: 0 1px 3px rgba(59, 91, 219, 0.04);
-    padding: 1.5rem;
+    background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(59, 91, 219, 0.04); padding: 1.5rem;
 }
-
-/* Metric Cards */
 div[data-testid="stMetric"] {
-    background: #FFFFFF;
-    border: 1px solid #E5E7EB;
-    border-radius: 14px;
-    padding: 1rem 1.2rem;
-    box-shadow: none;
+    background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 14px;
+    padding: 1rem 1.2rem; box-shadow: none;
 }
 div[data-testid="stMetric"] label {
-    color: #6B7280 !important;
-    font-size: 0.75rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
+    color: #6B7280 !important; font-size: 0.75rem; font-weight: 500;
+    text-transform: uppercase; letter-spacing: 0.8px;
 }
 div[data-testid="stMetric"] div[data-testid="stMetricValue"] {
-    color: #1A1F36;
-    font-weight: 700;
-    font-size: 1.6rem;
+    color: #1A1F36; font-weight: 700; font-size: 1.6rem;
 }
 
-/* Tabs แบบ minimal underline */
 div[data-testid="stTabs"] ul {
-    gap: 0.25rem;
-    padding: 0;
-    background: transparent;
-    border-radius: 0;
+    gap: 0.25rem; padding: 0; background: transparent;
     border-bottom: 1px solid #D1D5DB;
 }
 div[data-testid="stTabs"] button {
-    background: transparent;
-    color: #6B7280;
-    border-radius: 0;
-    font-weight: 500;
-    padding: 0.7rem 1.2rem;
-    border: none;
+    background: transparent; color: #6B7280; border-radius: 0;
+    font-weight: 500; padding: 0.7rem 1.2rem; border: none;
     border-bottom: 2px solid transparent;
 }
 div[data-testid="stTabs"] button[aria-selected="true"] {
-    color: #3B5BDB;
-    border-bottom: 2px solid #3B5BDB;
-    font-weight: 600;
-    background: transparent;
-    box-shadow: none;
+    color: #3B5BDB; border-bottom: 2px solid #3B5BDB;
+    font-weight: 600; background: transparent; box-shadow: none;
 }
-div[data-testid="stTabs"] button:hover {
-    color: #3B5BDB;
-    background: transparent;
-}
+div[data-testid="stTabs"] button:hover { color: #3B5BDB; background: transparent; }
 
-/* ปุ่มหลัก */
 div.stButton > button {
-    background: #3B5BDB;
-    color: #FFFFFF;
-    border: none;
-    border-radius: 10px;
-    font-weight: 500;
-    padding: 0.55rem 1.8rem;
-    box-shadow: 0 1px 2px rgba(59, 91, 219, 0.15);
-    transition: all 0.2s ease;
+    background: #3B5BDB; color: #FFFFFF; border: none; border-radius: 10px;
+    font-weight: 500; padding: 0.55rem 1.8rem;
+    box-shadow: 0 1px 2px rgba(59, 91, 219, 0.15); transition: all 0.2s ease;
 }
 div.stButton > button:hover {
-    background: #2C4BC4;
-    transform: translateY(-1px);
+    background: #2C4BC4; transform: translateY(-1px);
     box-shadow: 0 2px 4px rgba(59, 91, 219, 0.2);
 }
 
-/* ปุ่ม secondary */
-.secondary-btn {
-    background: #FFFFFF !important;
-    color: #3B5BDB !important;
-    border: 1px solid #3B5BDB !important;
-    padding: 0.5rem 1.2rem;
-    border-radius: 8px;
-    font-weight: 500;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    text-decoration: none;
-    font-size: 0.9rem;
-    transition: all 0.2s ease;
-}
-.secondary-btn:hover {
-    background: #E3EBFD !important;
-    color: #2C4BC4 !important;
-}
-
-/* Input */
 input, textarea {
-    border-radius: 8px !important;
-    border: 1px solid #D1D5DB !important;
+    border-radius: 8px !important; border: 1px solid #D1D5DB !important;
     padding: 0.5rem 0.8rem !important;
 }
 input:focus, textarea:focus {
@@ -151,165 +78,65 @@ input:focus, textarea:focus {
     box-shadow: 0 0 0 3px rgba(59, 91, 219, 0.1) !important;
 }
 div[data-baseweb="select"] > div {
-    border-radius: 8px !important;
-    border: 1px solid #D1D5DB !important;
+    border-radius: 8px !important; border: 1px solid #D1D5DB !important;
 }
 
-/* Progress bar */
-div[data-testid="stProgress"] > div {
-    background: #E3EBFD;
-    border-radius: 6px;
-}
-div[data-testid="stProgress"] > div > div {
-    background: #3B5BDB;
-    border-radius: 6px;
-}
+div[data-testid="stProgress"] > div { background: #E3EBFD; border-radius: 6px; }
+div[data-testid="stProgress"] > div > div { background: #3B5BDB; border-radius: 6px; }
 
-/* Expander */
 div[data-testid="stExpander"] {
-    border-radius: 10px;
-    background: #FFFFFF;
-    border: 1px solid #E5E7EB;
+    border-radius: 10px; background: #FFFFFF; border: 1px solid #E5E7EB;
 }
 
-/* Risk badges */
 .risk-fraud, .risk-normal {
-    padding: 0.4rem 0.9rem;
-    border-radius: 20px;
-    font-weight: 600;
-    font-size: 0.85rem;
-    display: inline-block;
+    padding: 0.4rem 0.9rem; border-radius: 20px; font-weight: 600;
+    font-size: 0.85rem; display: inline-block;
 }
 .risk-fraud  { background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5; }
 .risk-normal { background: #D1FAE5; color: #065F46; border: 1px solid #6EE7B7; }
 
-/* Developer Card */
 .dev-card {
-    background: #FFFFFF;
-    border: 1px solid #E5E7EB;
-    border-radius: 16px;
-    padding: 1.2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.8rem;
+    background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 16px;
+    padding: 1.2rem; display: flex; flex-direction: column; gap: 0.8rem;
 }
-.dev-card .dev-photo {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid #E3EBFD;
-    background: #E3EBFD;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.8rem;
-    color: #3B5BDB;
+.dev-photo {
+    width: 64px; height: 64px; border-radius: 50%; object-fit: cover;
+    border: 2px solid #E3EBFD; background: #E3EBFD;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem; color: #3B5BDB;
 }
-.dev-card .dev-name {
-    font-weight: 600;
-    color: #1A1F36;
-    font-size: 0.95rem;
-    margin: 0;
-}
-.dev-card .dev-id {
-    color: #6B7280;
-    font-size: 0.8rem;
-    margin: 0;
-}
-.dev-buttons {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    margin-top: 0.5rem;
-}
+.dev-name { font-weight: 600; color: #1A1F36; font-size: 0.95rem; margin: 0; }
+.dev-id { color: #6B7280; font-size: 0.8rem; margin: 0; }
+.dev-buttons { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem; }
 .dev-btn {
-    background: #E3EBFD;
-    color: #3B5BDB;
-    border: none;
-    padding: 0.4rem 0.8rem;
-    border-radius: 8px;
-    font-size: 0.8rem;
-    font-weight: 500;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-    text-decoration: none;
-    transition: all 0.2s ease;
+    background: #E3EBFD; color: #3B5BDB; border: none;
+    padding: 0.4rem 0.8rem; border-radius: 8px; font-size: 0.8rem;
+    font-weight: 500; cursor: pointer; display: inline-flex;
+    align-items: center; gap: 0.3rem; text-decoration: none; transition: all 0.2s ease;
 }
-.dev-btn:hover {
-    background: #3B5BDB;
-    color: #FFFFFF;
-}
+.dev-btn:hover { background: #3B5BDB; color: #FFFFFF; }
 
-/* Project tag */
 .tag-project {
-    display: inline-block;
-    background: #FFFFFF;
-    color: #3B5BDB;
-    font-size: 0.7rem;
-    letter-spacing: 1.5px;
-    padding: 0.25rem 0.7rem;
-    border-radius: 6px;
-    font-weight: 600;
-    border: 1px solid #A5B4FC;
-    margin-bottom: 0.5rem;
+    display: inline-block; background: #FFFFFF; color: #3B5BDB;
+    font-size: 0.7rem; letter-spacing: 1.5px; padding: 0.25rem 0.7rem;
+    border-radius: 6px; font-weight: 600; border: 1px solid #A5B4FC; margin-bottom: 0.5rem;
 }
-
 .header-line {
-    width: 48px;
-    height: 3px;
-    background: #3B5BDB;
-    border-radius: 2px;
-    margin: 0.5rem 0 1rem 0;
+    width: 48px; height: 3px; background: #3B5BDB;
+    border-radius: 2px; margin: 0.5rem 0 1rem 0;
 }
+.info-row { display: flex; gap: 0.5rem; padding: 0.3rem 0; font-size: 0.9rem; }
+.info-row .label { color: #6B7280; min-width: 100px; }
+.info-row .value { color: #1A1F36; font-weight: 500; }
 
-.info-row {
-    display: flex;
-    gap: 0.5rem;
-    padding: 0.3rem 0;
-    font-size: 0.9rem;
-}
-.info-row .label {
-    color: #6B7280;
-    min-width: 100px;
-}
-.info-row .value {
-    color: #1A1F36;
-    font-weight: 500;
-}
-
-/* Dialog customization */
-div[data-testid="stDialog"] {
-    background: #E3EBFD !important;
-}
+div[data-testid="stDialog"] { background: #E3EBFD !important; }
 div[data-testid="stDialog"] > div {
-    background: #FFFFFF;
-    border-radius: 20px;
-    padding: 2rem;
-    max-width: 500px;
-}
-
-/* Footer */
-.minimal-footer {
-    text-align: center;
-    color: #6B7280;
-    font-size: 0.8rem;
-    padding: 1.5rem 0;
-    border-top: 1px solid #E5E7EB;
-    margin-top: 2rem;
-}
-
-/* Sidebar custom (if needed) */
-section[data-testid="stSidebar"] {
-    background: #FFFFFF;
-    border-right: 1px solid #E5E7EB;
+    background: #FFFFFF; border-radius: 20px; padding: 2rem; max-width: 500px;
 }
 </style>
 """, unsafe_allow_html=True)
 
-# ==================== Dialog สำหรับหน้าผู้พัฒนา ====================
+# ==================== Dialog ผู้พัฒนา ====================
 @st.dialog("👤 ข้อมูลผู้พัฒนา", width="large")
 def show_developer_info():
     col1, col2 = st.columns([1, 2])
@@ -318,7 +145,7 @@ def show_developer_info():
             st.image("my_photo.jpg", use_container_width=True)
         else:
             st.markdown("""
-            <div style="width:100%; aspect-ratio:1; background:#E3EBFD; border-radius:16px; 
+            <div style="width:100%; aspect-ratio:1; background:#E3EBFD; border-radius:16px;
                         display:flex; align-items:center; justify-content:center; font-size:4rem; color:#3B5BDB;">
                 👤
             </div>
@@ -332,25 +159,22 @@ def show_developer_info():
         <div class="info-row"><span class="label">สาขา</span><span class="value">วิทยาการคอมพิวเตอร์</span></div>
         <div class="info-row"><span class="label">สถาบัน</span><span class="value">……………</span></div>
         """, unsafe_allow_html=True)
-    
+
     st.markdown("---")
     st.markdown("### 📝 เกี่ยวกับโปรเจกต์")
     st.write("โครงงานนี้เป็นส่วนหนึ่งของวิชา Machine Learning โดยมีวัตถุประสงค์เพื่อศึกษาและประยุกต์ใช้"
              "เทคนิคการเรียนรู้ของเครื่องในการตรวจจับธุรกรรมบัตรเครดิตที่น่าสงสัย")
-    
+
     st.markdown("### 🛠️ เทคโนโลยีที่ใช้")
     tech_cols = st.columns(4)
-    techs = ["Python", "scikit-learn", "Streamlit", "imbalanced-learn"]
-    for i, tech in enumerate(techs):
+    for i, tech in enumerate(["Python", "scikit-learn", "Streamlit", "imbalanced-learn"]):
         with tech_cols[i]:
             st.markdown(f"<div style='background:#E3EBFD; padding:0.5rem; border-radius:8px; text-align:center; color:#3B5BDB; font-weight:500;'>{tech}</div>", unsafe_allow_html=True)
-    
+
     st.markdown("### 🔗 ลิงก์ที่เกี่ยวข้อง")
-    st.markdown("""
-    - 🌐 [GitHub Profile](https://github.com/aomaem21100-maker?tab=repositories)
-    - 📦 [Source Code ของโปรเจกต์นี้](https://github.com/aomaem21100-maker)
-    - 📚 [Dataset: Credit Card Fraud Detection (Kaggle)](https://www.kaggle.com/mlg-ulb/creditcardfraud)
-    """)
+    st.markdown("- 🌐 [GitHub Profile](https://github.com/aomaem21100-maker?tab=repositories)\n"
+                "- 📦 [Source Code ของโปรเจกต์นี้](https://github.com/aomaem21100-maker)\n"
+                "- 📚 [Dataset: Credit Card Fraud Detection (Kaggle)](https://www.kaggle.com/mlg-ulb/creditcardfraud)")
 
 # ==================== Helpers ====================
 def make_data(n=20000, seed=42):
@@ -366,27 +190,27 @@ def make_data(n=20000, seed=42):
 def build_models():
     from imblearn.over_sampling import SMOTE
     from sklearn.model_selection import train_test_split
-    
+
     df = make_data(20000)
     X = df.drop(columns=["Class"])
     y = df["Class"]
-    
+
     cols_to_scale = ["Amount", "Time"]
     scaler = StandardScaler()
     X[cols_to_scale] = scaler.fit_transform(X[cols_to_scale])
-    
+
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
-    
+
     smote = SMOTE(random_state=42)
     X_train_res, y_train_res = smote.fit_resample(X_train, y_train)
-    
+
     models = {
         "Logistic Regression": LogisticRegression(max_iter=1000, class_weight="balanced"),
         "Decision Tree": DecisionTreeClassifier(random_state=42, max_depth=10, class_weight="balanced"),
         "Random Forest": RandomForestClassifier(n_estimators=100, random_state=42, class_weight="balanced"),
         "K-NN": KNeighborsClassifier(n_neighbors=5),
     }
-    
+
     trained = {}
     for name, m in models.items():
         if name == "K-NN":
@@ -419,21 +243,17 @@ with h2:
             </div>
         </div>
         <div class="dev-buttons">
-            <span id="dev-info-trigger" class="dev-btn">👤 ดูข้อมูลผู้พัฒนา</span>
             <a href="https://github.com/aomaem21100-maker?tab=repositories" target="_blank" class="dev-btn">
                 🔗 GitHub Profile
             </a>
         </div>
     </div>
     """, unsafe_allow_html=True)
-    
-    # ปุ่มเปิด dialog (วางซ้อนทับ)
-    dev_btn_col, _ = st.columns([1, 3])
-    with dev_btn_col:
-        if st.button("👤 ดูข้อมูลผู้พัฒนา", use_container_width=True):
-            show_developer_info()
 
-# ==================== ตัวชี้วัดโครงการ ====================
+    if st.button("👤 ดูข้อมูลผู้พัฒนา", use_container_width=True):
+        show_developer_info()
+
+# ==================== METRICS ====================
 st.markdown("")
 m1, m2, m3, m4, _ = st.columns([1, 1, 1, 1, 1.2], gap="medium")
 m1.metric("ขนาดข้อมูล", "20,000")
@@ -511,7 +331,7 @@ with t4:
 with t5:
     with st.container(border=True):
         st.subheader("5.1 ทดลองตรวจจับธุรกรรม")
-        
+
         if st.session_state.models is None:
             st.info("⏳ โมเดลยังไม่ถูกฝึก — กดปุ่มด้านล่างเพื่อเริ่มต้น")
             if st.button("🚀 เริ่มต้นฝึกโมเดล", use_container_width=True):
@@ -541,8 +361,13 @@ with t5:
                 features = np.zeros(30)
                 features[0] = v1
                 features[1] = v2
-                features[28] = scaler.transform(pd.DataFrame([[amount]], columns=["Amount"]))[0][0]
-                features[29] = scaler.transform(pd.DataFrame([[time_val]], columns=["Time"]))[0][0]
+
+                # ✅ แก้ ValueError: ส่งทั้ง 2 คอลัมน์พร้อมกันให้ตรงกับตอนฝึก scaler
+                scaled = scaler.transform(
+                    pd.DataFrame([[amount, time_val]], columns=["Amount", "Time"])
+                )[0]
+                features[28] = scaled[0]   # Amount
+                features[29] = scaled[1]   # Time
 
                 inp = pd.DataFrame([features], columns=[f"V{i}" for i in range(1, 29)] + ["Amount", "Time"])
                 m = models[model_name]
