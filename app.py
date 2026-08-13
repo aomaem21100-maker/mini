@@ -1,19 +1,54 @@
 import os
 import streamlit as st
 import pandas as pd
-import joblib
+
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import StandardScaler, OrdinalEncoder
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.neighbors import KNeighborsClassifier
 
 st.set_page_config(page_title="CKD Prediction", page_icon="🩺", layout="wide")
 
-model = joblib.load("best_model.pkl")
-ref = pd.read_csv("kidney_disease.csv")
-ref.columns = ref.columns.str.strip()
-ref = ref.drop(columns=["id"], errors="ignore")
-for c in ref.select_dtypes(include="object").columns:
-    ref[c] = ref[c].str.strip()
-for c in ["pcv", "wc", "rc"]:
-    ref[c] = pd.to_numeric(ref[c], errors="coerce")
-X_ref = ref.drop(columns=["classification"])
+# ===== เทรนโมเดลสดบน Cloud แทนการโหลด .pkl (กันเวอร์ชันเพี้ยน) =====
+@st.cache_resource
+def build_models():
+    df = pd.read_csv("kidney_disease.csv")
+    df.columns = df.columns.str.strip()
+    df = df.drop(columns=["id"], errors="ignore")
+    for c in df.select_dtypes(include="object").columns:
+        df[c] = df[c].str.strip()
+    for c in ["pcv", "wc", "rc"]:
+        df[c] = pd.to_numeric(df[c], errors="coerce")
+
+    X = df.drop(columns=["classification"])
+    y = (df["classification"] == "ckd").astype(int)
+
+    num_cols = X.select_dtypes(include="number").columns.tolist()
+    cat_cols = X.select_dtypes(include="object").columns.tolist()
+
+    pre = ColumnTransformer([
+        ("num", Pipeline([("imp", SimpleImputer(strategy="median")),
+                          ("sc", StandardScaler())]), num_cols),
+        ("cat", Pipeline([("imp", SimpleImputer(strategy="most_frequent")),
+                          ("oe", OrdinalEncoder(handle_unknown="use_encoded_value",
+                                                unknown_value=-1))]), cat_cols),
+    ])
+
+    models = {
+        "Logistic Regression": Pipeline([("pre", pre), ("m", LogisticRegression(max_iter=1000))]),
+        "Decision Tree":       Pipeline([("pre", pre), ("m", DecisionTreeClassifier(random_state=42))]),
+        "Random Forest":       Pipeline([("pre", pre), ("m", RandomForestClassifier(random_state=42))]),
+        "K-NN":                Pipeline([("pre", pre), ("m", KNeighborsClassifier())]),
+    }
+    for p in models.values():
+        p.fit(X, y)                      # เทรนด้วยข้อมูลทั้งหมดเพื่อใช้ทำนายจริง
+    return X, models
+
+X_ref, models = build_models()
 
 # ===== ส่วนบังคับ: หัวข้อ + รูป + รหัส + ชื่อ + หมู่เรียน =====
 st.title("🩺 เว็บไซต์ทำนายโรคไตเรื้อรังด้วย Machine Learning")
@@ -32,7 +67,7 @@ with t1:
     st.write("โรคไตเรื้อรังระยะแรกมักไม่มีอาการชัดเจน จึงใช้ ML คัดกรองผู้ป่วยเสี่ยงสูงจากค่าแล็บ เพื่อช่วยแพทย์วินิจฉัยได้เร็วขึ้น")
     st.subheader("Dataset: Chronic Kidney Disease (UCI)")
     st.write("400 แถว | 24 คุณลักษณะ | ตัวแปรเป้าหมาย: classification (ckd / notckd)")
-    st.dataframe(ref.head(10), use_container_width=True)
+    st.dataframe(X_ref.head(10), use_container_width=True)
 
 with t2:
     st.subheader("ขั้นตอน Data Preprocessing")
@@ -48,20 +83,25 @@ with t3:
     st.subheader("โมเดล Machine Learning ที่ใช้")
     st.markdown("""
     - **Logistic Regression:** ใช้ฟังก์ชัน Sigmoid แปลงค่าเป็นความน่าจะเป็น 0–1 แล้วตัดที่ 0.5 เพื่อจำแนกคลาส
-    - **Decision Tree:** แบ่งข้อมูลเป็นกิ่งด้วยฟีเจอร์ที่ลดความไม่บริสุทธิ์ (Gini/Entropy) มากที่สุด ตีความง่ายแต่ Overfit ง่าย
+    - **Decision Tree:** แบ่งข้อมูลเป็นกิ่งด้วยฟีเจอร์ที่ลดความไม่บริสุทธิ์ (Gini/Entropy) มากที่สุด
     - **Random Forest:** สร้าง Decision Tree หลายต้นแบบ Bagging แล้วโหวตรวม ลด Overfitting
-    - **K-NN:** จำแนกคลาสจากเพื่อนบ้าน k ตัวที่ใกล้ที่สุดด้วยระยะทางยุคลิด จึงต้อง Scaling ก่อนเสมอ
+    - **K-NN:** จำแนกจากเพื่อนบ้าน k ตัวที่ใกล้ที่สุดด้วยระยะทางยุคลิด จึงต้อง Scaling ก่อนเสมอ
     """)
 
 with t4:
     st.subheader("การประเมินและเปรียบเทียบโมเดล")
-    st.dataframe(pd.read_csv("model_comparison.csv"), use_container_width=True)
-    st.image("compare.png", caption="กราฟแท่งเปรียบเทียบโมเดล")
-    st.image("roc.png", caption="กราฟ ROC Curve")
-    st.image("cm.png", caption="Confusion Matrix ของโมเดลที่ดีที่สุด")
+    if os.path.exists("model_comparison.csv"):
+        st.dataframe(pd.read_csv("model_comparison.csv"), use_container_width=True)
+    if os.path.exists("compare.png"):
+        st.image("compare.png", caption="กราฟแท่งเปรียบเทียบโมเดล")
+    if os.path.exists("roc.png"):
+        st.image("roc.png", caption="กราฟ ROC Curve")
+    if os.path.exists("cm.png"):
+        st.image("cm.png", caption="Confusion Matrix ของโมเดลที่ดีที่สุด")
 
 with t5:
     st.subheader("ทดลองทำนาย")
+    model_name = st.selectbox("เลือกโมเดลที่ต้องการใช้", list(models.keys()), index=2)
     user_input = {}
     cols = st.columns(4)
     for i, c in enumerate(X_ref.columns):
@@ -73,8 +113,9 @@ with t5:
                 user_input[c] = st.selectbox(c, opts, key=c)
     if st.button("🔮 ทำนายผล"):
         inp = pd.DataFrame([user_input])[X_ref.columns]
-        pred = model.predict(inp)[0]
-        proba = model.predict_proba(inp)[0][1] * 100
+        m = models[model_name]
+        pred = m.predict(inp)[0]
+        proba = m.predict_proba(inp)[0][1] * 100
         if pred == 1:
             st.error(f"ผลทำนาย: **เสี่ยงโรคไตเรื้อรัง (ckd)** ความมั่นใจ {proba:.1f}%")
         else:
