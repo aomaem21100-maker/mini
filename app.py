@@ -24,32 +24,27 @@ div[data-testid="stAppViewContainer"], section.main, .stApp { background:#E0E0F3
 #MainMenu, header, footer { visibility:hidden; }
 h1,h2,h3,h4,p,span,li { color:#33335A; }
 
-/* การ์ดขาวมุมมน */
 div[data-testid="stVerticalBlockBorderWrapper"] {
     background:#FFFFFF; border:none; border-radius:24px;
     box-shadow:0 4px 20px rgba(90,90,160,.07);
 }
-/* การ์ดตัวเลข */
 div[data-testid="stMetric"] {
     background:#FFFFFF; border-radius:20px; padding:1.1rem 1.4rem;
     box-shadow:0 4px 20px rgba(90,90,160,.07);
 }
 div[data-testid="stMetric"] label { color:#8A8AA8 !important; font-weight:500; }
 
-/* Tabs แบบยาเม็ด */
 div[data-testid="stTabs"] ul { gap:.4rem; }
 div[data-testid="stTabs"] button { background:transparent; color:#6E6E93; border-radius:999px; font-weight:500; }
 div[data-testid="stTabs"] button[aria-selected="true"] { background:#6C63FF; color:#fff; }
 div[data-testid="stTabs"] button:hover { color:#6C63FF; }
 
-/* ปุ่ม */
 div.stButton > button {
     background:#6C63FF; color:#fff; border:none; border-radius:14px;
     font-weight:600; padding:.55rem 2.5rem;
 }
 div.stButton > button:hover { background:#574FE0; }
 
-/* ช่องกรอก */
 input { border-radius:12px !important; border:1px solid #DCDCF0 !important; }
 div[data-baseweb="select"] > div { border-radius:12px !important; border:1px solid #DCDCF0 !important; }
 div[data-testid="stAlert"] { border-radius:16px; }
@@ -65,7 +60,6 @@ def build_models():
     for c in df.select_dtypes(include="object").columns:
         df[c] = df[c].str.strip()
 
-    # ✅ บังคับแปลงคอลัมน์ตัวเลขทุกตัว (แก้ KeyError: 'k')
     NUM_COLS = ["age", "bp", "sg", "al", "su", "bgr", "bu", "sc",
                 "sod", "k", "hemo", "pcv", "wc", "rc"]
     for c in NUM_COLS:
@@ -97,6 +91,18 @@ X_ref, models = build_models()
 comp = pd.read_csv("model_comparison.csv") if os.path.exists("model_comparison.csv") else None
 best = comp.sort_values("Accuracy", ascending=False).iloc[0] if comp is not None else None
 
+# ==================== ค่าสำรองกันพลาด (Defensive Defaults) ====================
+FALLBACK = {"age": 48.0, "bp": 80.0, "bgr": 100.0, "bu": 36.0,
+            "sc": 1.1, "hemo": 12.5, "sod": 138.0, "k": 4.5}
+
+def num_default(col):
+    """ค่ากลางของคอลัมน์ ถ้าไม่มีคอลัมน์นี้/ไม่ใช่ตัวเลข ใช้ค่าทางการแพทย์แทน"""
+    if col in X_ref.columns and pd.api.types.is_numeric_dtype(X_ref[col]):
+        v = X_ref[col].median()
+        if pd.notna(v):
+            return float(v)
+    return FALLBACK.get(col, 0.0)
+
 # ==================== HEADER ====================
 h1, h2 = st.columns([3, 1], gap="large")
 with h1:
@@ -110,8 +116,8 @@ with h2:
 
 # ==================== METRICS ====================
 m1, m2, m3, m4 = st.columns(4)
-m1.metric("ข้อมูลตัวอย่าง", "400 แถว")
-m2.metric("ฟีเจอร์", "24 ตัว")
+m1.metric("ข้อมูลตัวอย่าง", f"{len(X_ref)} แถว")
+m2.metric("ฟีเจอร์", f"{len(X_ref.columns)} ตัว")
 m3.metric("โมเดลที่ดีที่สุด", best["Model"] if best is not None else "–")
 m4.metric("Accuracy สูงสุด", f"{best['Accuracy']:.2%}" if best is not None else "–")
 
@@ -128,6 +134,8 @@ with t1:
         st.subheader("Dataset : Chronic Kidney Disease (UCI)")
         st.write("400 แถว • 24 คุณลักษณะ • ตัวแปรเป้าหมาย: classification (ckd / notckd)")
         st.dataframe(X_ref.head(8), use_container_width=True, hide_index=True)
+        with st.expander("ดูชนิดข้อมูลแต่ละคอลัมน์ (dtypes)"):
+            st.code(X_ref.dtypes.astype(str))
 
 with t2:
     with st.container(border=True):
@@ -166,21 +174,26 @@ with t5:
         model_name = st.selectbox("เลือกโมเดล", list(models.keys()), index=2)
         st.caption("กรอกเฉพาะค่าหลัก 8 รายการ — ค่าที่เหลือระบบเติมมัธยฐาน/ฐานนิยมให้อัตโนมัติ")
 
-        base_num = {c: float(X_ref[c].median()) for c in X_ref.select_dtypes(include="number").columns}
-        base_cat = {c: X_ref[c].mode()[0] for c in X_ref.select_dtypes(include="object").columns}
-        user_input = {**base_num, **base_cat}
+        # เติมค่าตั้งต้นให้ครบทุกคอลัมน์ที่มีจริง (กันพลาดทุกกรณี)
+        user_input = {}
+        for c in X_ref.columns:
+            if pd.api.types.is_numeric_dtype(X_ref[c]):
+                user_input[c] = float(X_ref[c].median()) if pd.notna(X_ref[c].median()) else 0.0
+            else:
+                modes = X_ref[c].mode()
+                user_input[c] = modes[0] if len(modes) else "unknown"
 
         fa, fb = st.columns(2)
         with fa:
-            user_input["age"]  = st.number_input("อายุ (ปี)", 1, 95, value=int(base_num["age"]))
-            user_input["bp"]   = st.number_input("ความดันโลหิต (mmHg)", 50, 190, value=int(base_num["bp"]))
-            user_input["bgr"]  = st.number_input("น้ำตาลในเลือด (bgr)", 20, 450, value=int(base_num["bgr"]))
-            user_input["bu"]   = st.number_input("ยูเรีย (bu)", 1, 400, value=int(base_num["bu"]))
+            user_input["age"]  = st.number_input("อายุ (ปี)", 1, 95, value=int(num_default("age")))
+            user_input["bp"]   = st.number_input("ความดันโลหิต (mmHg)", 50, 190, value=int(num_default("bp")))
+            user_input["bgr"]  = st.number_input("น้ำตาลในเลือด (bgr)", 20, 450, value=int(num_default("bgr")))
+            user_input["bu"]   = st.number_input("ยูเรีย (bu)", 1, 400, value=int(num_default("bu")))
         with fb:
-            user_input["sc"]   = st.number_input("ครีเอทินีน (sc)", 0.0, 80.0, value=float(base_num["sc"]))
-            user_input["hemo"] = st.number_input("ฮีโมโกลบิน (hemo)", 3.0, 18.0, value=float(base_num["hemo"]))
-            user_input["sod"]  = st.number_input("โซเดียม (sod)", 50, 200, value=int(base_num["sod"]))
-            user_input["k"]    = st.number_input("โพแทสเซียม (k)", 1.5, 8.0, value=float(base_num["k"]))
+            user_input["sc"]   = st.number_input("ครีเอทินีน (sc)", 0.0, 80.0, value=num_default("sc"))
+            user_input["hemo"] = st.number_input("ฮีโมโกลบิน (hemo)", 3.0, 18.0, value=num_default("hemo"))
+            user_input["sod"]  = st.number_input("โซเดียม (sod)", 50, 200, value=int(num_default("sod")))
+            user_input["k"]    = st.number_input("โพแทสเซียม (k)", 1.5, 8.0, value=num_default("k"))
 
         if st.button("🔮 ทำนายผล", use_container_width=True):
             inp = pd.DataFrame([user_input])[X_ref.columns]
