@@ -64,8 +64,13 @@ def build_models():
     df = df.drop(columns=["id"], errors="ignore")
     for c in df.select_dtypes(include="object").columns:
         df[c] = df[c].str.strip()
-    for c in ["pcv", "wc", "rc"]:
-        df[c] = pd.to_numeric(df[c], errors="coerce")
+
+    # ✅ บังคับแปลงคอลัมน์ตัวเลขทุกตัว (แก้ KeyError: 'k')
+    NUM_COLS = ["age", "bp", "sg", "al", "su", "bgr", "bu", "sc",
+                "sod", "k", "hemo", "pcv", "wc", "rc"]
+    for c in NUM_COLS:
+        if c in df.columns:
+            df[c] = pd.to_numeric(df[c], errors="coerce")
 
     X = df.drop(columns=["classification"])
     y = (df["classification"] == "ckd").astype(int)
@@ -128,7 +133,7 @@ with t2:
     with st.container(border=True):
         st.subheader("ขั้นตอน Data Preprocessing")
         st.markdown("""
-        1. แก้ชนิดข้อมูล — แปลงคอลัมน์ pcv, wc, rc จากข้อความ → ตัวเลข
+        1. แก้ชนิดข้อมูล — แปลงคอลัมน์ตัวเลข 14 ตัว (pcv, wc, rc, k ฯลฯ) จากข้อความ → ตัวเลข
         2. จัดการค่าสูญหาย — ตัวเลขเติม Median / หมวดหมู่เติม Mode
         3. Encoding — แปลงข้อมูลหมวดหมู่เป็นตัวเลขด้วย Ordinal Encoding
         4. Scaling — ปรับสเกลด้วย StandardScaler (จำเป็นสำหรับ K-NN)
@@ -172,10 +177,10 @@ with t5:
             user_input["bgr"]  = st.number_input("น้ำตาลในเลือด (bgr)", 20, 450, value=int(base_num["bgr"]))
             user_input["bu"]   = st.number_input("ยูเรีย (bu)", 1, 400, value=int(base_num["bu"]))
         with fb:
-            user_input["sc"]    = st.number_input("ครีเอทินีน (sc)", 0.0, 80.0, value=float(base_num["sc"]))
-            user_input["hemo"]  = st.number_input("ฮีโมโกลบิน (hemo)", 3.0, 18.0, value=float(base_num["hemo"]))
-            user_input["sod"]   = st.number_input("โซเดียม (sod)", 50, 200, value=int(base_num["sod"]))
-            user_input["k"]     = st.number_input("โพแทสเซียม (k)", 1.5, 8.0, value=float(base_num["k"]))
+            user_input["sc"]   = st.number_input("ครีเอทินีน (sc)", 0.0, 80.0, value=float(base_num["sc"]))
+            user_input["hemo"] = st.number_input("ฮีโมโกลบิน (hemo)", 3.0, 18.0, value=float(base_num["hemo"]))
+            user_input["sod"]  = st.number_input("โซเดียม (sod)", 50, 200, value=int(base_num["sod"]))
+            user_input["k"]    = st.number_input("โพแทสเซียม (k)", 1.5, 8.0, value=float(base_num["k"]))
 
         if st.button("🔮 ทำนายผล", use_container_width=True):
             inp = pd.DataFrame([user_input])[X_ref.columns]
