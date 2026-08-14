@@ -59,7 +59,6 @@ section[data-testid="stSidebar"] label { color: #1A1A2E; }
     background: repeating-linear-gradient(45deg, #FF7A00 0 10px, #14141E 10px 20px);
 }
 
-/* ✅ แก้ Sidebar selectbox ให้มองเห็นชัด คลิกง่าย */
 section[data-testid="stSidebar"] .stSelectbox { margin-top: 1rem; }
 section[data-testid="stSidebar"] .stSelectbox > div {
     background: #FFFFFF !important;
@@ -73,7 +72,6 @@ section[data-testid="stSidebar"] .stSelectbox > div:hover {
     box-shadow: 0 0 12px rgba(57, 255, 20, 0.3);
 }
 
-/* ข้อความหลัก */
 html, body, [class*="css"] { font-family: 'IBM Plex Sans Thai', 'Inter', sans-serif; }
 h1,h2,h3,h4 { color: #F2F5FB; font-weight: 600; }
 p, li { color: #D5DCEA; }
@@ -124,15 +122,15 @@ div.stButton > button {
 }
 div.stButton > button:hover { background: #52FF33; box-shadow: 0 0 22px rgba(57,255,20,.55); }
 
-/* ✅ ปุ่มเมนูด้านบน (แถบ gradient) */
-.top-menu-btn > button {
+/* ✅ ปุ่มเมนูด้านบน */
+.top-menu-btn button {
     background: linear-gradient(135deg, #39FF14, #6A3AB2) !important;
     color: #0A0A0A !important;
     font-weight: 700 !important;
     font-size: 0.95rem !important;
     font-family: 'Orbitron', 'IBM Plex Sans Thai', sans-serif !important;
 }
-.top-menu-btn > button:hover {
+.top-menu-btn button:hover {
     filter: brightness(1.1);
     box-shadow: 0 0 20px rgba(57, 255, 20, 0.5) !important;
 }
@@ -253,39 +251,51 @@ def train_now(key):
             st.session_state["eval"] = build_and_eval()
         st.rerun()
 
-# ==================== ✅ แถบเมนู: Sidebar + แถบบน ====================
+# ✅ Callback functions สำหรับปุ่มเมนูบน
+def go_home():
+    st.session_state["current_page"] = "🏠 หน้าหลัก"
+
+def go_dev():
+    st.session_state["current_page"] = "👤 ผู้พัฒนา"
+
+# ==================== ✅ ตั้งค่า state เริ่มต้น (ครั้งเดียว) ====================
+if "current_page" not in st.session_state:
+    st.session_state["current_page"] = "🏠 หน้าหลัก"
+
+# ==================== แถบเมนู: Sidebar + แถบบน ====================
 st.sidebar.markdown('<div class="hub-title">MACHINE LEARNING HUB</div>', unsafe_allow_html=True)
 st.sidebar.markdown('<hr class="hub-hr">', unsafe_allow_html=True)
 st.sidebar.markdown("### 📍 นำทาง")
+
+# ✅ ใช้ state ตัวกลาง "current_page" เป็น default ของ selectbox
+# แล้วเมื่อกด selectbox ก็อัปเดต current_page กลับ
 page = st.sidebar.selectbox(
     "เลือกหน้า",
     ["🏠 หน้าหลัก", "👤 ผู้พัฒนา"],
-    label_visibility="collapsed",
-    index=0,
-    key="sidebar_nav"
+    index=["🏠 หน้าหลัก", "👤 ผู้พัฒนา"].index(st.session_state["current_page"]),
+    key="sidebar_nav_widget"
 )
+# อัปเดต state เมื่อ selectbox เปลี่ยน
+st.session_state["current_page"] = page
 
-# แถบเมนูด้านบน (สำรอง)
+# แถบเมนูด้านบน (ใช้ callback ไม่แก้ widget key โดยตรง)
 tb1, tb2, tb3 = st.columns([1.2, 1.2, 6])
 with tb1:
     with st.container():
         st.markdown('<div class="top-menu-btn">', unsafe_allow_html=True)
-        if st.button("🏠 หน้าหลัก", use_container_width=True, key="top_home"):
-            st.session_state["sidebar_nav"] = "🏠 หน้าหลัก"
-            st.rerun()
+        st.button("🏠 หน้าหลัก", use_container_width=True, key="top_home_btn", on_click=go_home)
         st.markdown('</div>', unsafe_allow_html=True)
 with tb2:
     with st.container():
         st.markdown('<div class="top-menu-btn">', unsafe_allow_html=True)
-        if st.button("👤 ผู้พัฒนา", use_container_width=True, key="top_dev"):
-            st.session_state["sidebar_nav"] = "👤 ผู้พัฒนา"
-            st.rerun()
+        st.button("👤 ผู้พัฒนา", use_container_width=True, key="top_dev_btn", on_click=go_dev)
         st.markdown('</div>', unsafe_allow_html=True)
 
 EV = st.session_state.get("eval", None)
+page = st.session_state["current_page"]  # ใช้ค่าจริงจาก state
 
 # ================================================================
-#              หน้าหลัก — เนื้อหาโปรเจกต์
+#              หน้าหลัก
 # ================================================================
 if page == "🏠 หน้าหลัก":
     st.markdown('<span class="tag-cyber">MACHINE LEARNING PROJECT</span>', unsafe_allow_html=True)
@@ -419,7 +429,7 @@ if page == "🏠 หน้าหลัก":
     st.caption("📚 จัดทำเพื่อประกอบการเรียนวิชา Machine Learning • 🛠️ พัฒนาด้วย Python, scikit-learn, Streamlit")
 
 # ================================================================
-#      👤 หน้าผู้พัฒนา — แยกอิสระ (เลย์เอาต์กลางจอ สี Eva)
+#      👤 หน้าผู้พัฒนา
 # ================================================================
 else:
     st.markdown("""
