@@ -396,17 +396,15 @@ if page == "🏠 หน้าหลัก":
     st.caption("📚 จัดทำเพื่อประกอบการเรียนวิชา Machine Learning • 🛠️ พัฒนาด้วย Python, scikit-learn, Streamlit")
 
 # ================================================================
-#      👤 หน้าผู้พัฒนา
+#      👤 หน้าผู้พัฒนา (กึ่งกลาง + รูปวงกลมสมส่วน ชัวร์ทุกเวอร์ชัน)
 # ================================================================
 else:
     st.markdown("""
     <style>
-    div[data-testid="stVerticalBlockBorderWrapper"] { max-width: 680px; margin: 0 auto; }
-
-    /* ✅ รูปโปรไฟล์สมส่วน ไม่ตัดหัว */
-    div[data-testid="stAppViewContainer"] section.main img {
+    /* ✅ รูปโปรไฟล์: วงกลม สมส่วน ไม่ตัดหัว (selector ตรง ไม่พึ่ง testid) */
+    img {
         display: block; margin: 0 auto;
-        width: 240px; height: 240px;
+        aspect-ratio: 1 / 1;
         object-fit: cover;
         object-position: center top;
         border-radius: 50%;
@@ -416,12 +414,12 @@ else:
         box-shadow: 0 0 40px rgba(57, 255, 20, .4);
         transition: all 0.3s ease;
     }
-    div[data-testid="stAppViewContainer"] section.main img:hover {
-        transform: scale(1.05);
+    img:hover {
+        transform: scale(1.03);
         box-shadow: 0 0 50px rgba(57, 255, 20, .6);
     }
 
-    .dev-head { text-align: center; margin-top: 1.5rem; }
+    .dev-head { text-align: center; margin-top: 1rem; }
     .dev-title {
         font-size: 2.6rem; font-weight: 800;
         background: linear-gradient(90deg, #39FF14 0%, #7EF29A 35%, #6A3AB2 75%, #FF7A00 100%);
@@ -457,51 +455,54 @@ else:
     </style>
     """, unsafe_allow_html=True)
 
-    st.markdown("""
-    <div class="dev-head">
-        <div class="dev-title">ผู้พัฒนา</div>
-        <div class="dev-sub">ข้อมูลผู้จัดทำโปรเจค Machine Learning Hub</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    if PHOTO:
-        st.image(PHOTO)
-    else:
-        st.markdown('<div class="dev-avatar">👤</div>', unsafe_allow_html=True)
-
-    st.markdown("")
-
-    with st.container(border=True):
-        st.markdown('<div class="dev-name">นาย จตุรภัทร สถาปีตานนท์</div>', unsafe_allow_html=True)
+    # ✅ จัดกึ่งกลางด้วยคอลัมน์ (ไม่พึ่ง CSS testid)
+    _, mid, _ = st.columns([1, 2.2, 1])
+    with mid:
         st.markdown("""
-        <div class="info-row"><span class="label">รหัสนักศึกษา</span><span class="value">664245024</span></div>
-        <div class="info-row"><span class="label">หมู่เรียน</span><span class="value">Sec. 66/43</span></div>
-        <div class="info-row"><span class="label">สาขา</span><span class="value">วิทยาการคอมพิวเตอร์</span></div>
-        """, unsafe_allow_html=True)
-
-    st.markdown("")
-
-    with st.container(border=True):
-        st.markdown('<div class="dev-center"><h3 style="margin:.2rem 0 .5rem 0;">📝 เกี่ยวกับโปรเจกต์</h3></div>', unsafe_allow_html=True)
-        st.write("💡 โครงงานนี้เป็นส่วนหนึ่งของวิชา Machine Learning โดยมีวัตถุประสงค์เพื่อศึกษาและประยุกต์ใช้"
-                 "เทคนิคการเรียนรู้ของเครื่องในการตรวจจับธุรกรรมบัตรเครดิตที่น่าสงสัย")
-
-        st.markdown('<div class="dev-center"><h3 style="margin:1rem 0 .5rem 0;">🛠️ เทคโนโลยีที่ใช้</h3></div>', unsafe_allow_html=True)
-        st.markdown("""
-        <div class="dev-center">
-            <span class="dev2-chip">🐍 Python</span>
-            <span class="dev2-chip">🤖 scikit-learn</span>
-            <span class="dev2-chip">🚀 Streamlit</span>
-            <span class="dev2-chip purple">⚖️ imbalanced-learn</span>
-            <span class="dev2-chip purple">📊 matplotlib</span>
-            <span class="dev2-chip orange">🐼 pandas</span>
+        <div class="dev-head">
+            <div class="dev-title">ผู้พัฒนา</div>
+            <div class="dev-sub">ข้อมูลผู้จัดทำโปรเจค Machine Learning Hub</div>
         </div>
         """, unsafe_allow_html=True)
 
-        st.markdown('<div class="dev-center"><h3 style="margin:1rem 0 .5rem 0;">🔗 ลิงก์ที่เกี่ยวข้อง</h3></div>', unsafe_allow_html=True)
-        st.markdown("- 🌐 [GitHub Profile](https://github.com/aomaem21100-maker?tab=repositories)\n"
-                    "- 📦 [Source Code โปรเจกต์นี้](https://github.com/aomaem21100-maker)\n"
-                    "- 📚 [Dataset: Credit Card Fraud Detection (Kaggle)](https://www.kaggle.com/mlg-ulb/creditcardfraud)")
+        if PHOTO:
+            st.image(PHOTO, width=240)
+        else:
+            st.markdown('<div class="dev-avatar">👤</div>', unsafe_allow_html=True)
 
-    st.markdown("---")
-    st.caption("© 2568 • Machine Learning Hub")
+        st.markdown("")
+
+        with st.container(border=True):
+            st.markdown('<div class="dev-name">นาย จตุรภัทร สถาปีตานนท์</div>', unsafe_allow_html=True)
+            st.markdown("""
+            <div class="info-row"><span class="label">รหัสนักศึกษา</span><span class="value">664245024</span></div>
+            <div class="info-row"><span class="label">หมู่เรียน</span><span class="value">Sec. 66/43</span></div>
+            <div class="info-row"><span class="label">สาขา</span><span class="value">วิทยาการคอมพิวเตอร์</span></div>
+            """, unsafe_allow_html=True)
+
+        st.markdown("")
+
+        with st.container(border=True):
+            st.markdown('<div class="dev-center"><h3 style="margin:.2rem 0 .5rem 0;">📝 เกี่ยวกับโปรเจกต์</h3></div>', unsafe_allow_html=True)
+            st.write("💡 โครงงานนี้เป็นส่วนหนึ่งของวิชา Machine Learning โดยมีวัตถุประสงค์เพื่อศึกษาและประยุกต์ใช้"
+                     "เทคนิคการเรียนรู้ของเครื่องในการตรวจจับธุรกรรมบัตรเครดิตที่น่าสงสัย")
+
+            st.markdown('<div class="dev-center"><h3 style="margin:1rem 0 .5rem 0;">🛠️ เทคโนโลยีที่ใช้</h3></div>', unsafe_allow_html=True)
+            st.markdown("""
+            <div class="dev-center">
+                <span class="dev2-chip">🐍 Python</span>
+                <span class="dev2-chip">🤖 scikit-learn</span>
+                <span class="dev2-chip">🚀 Streamlit</span>
+                <span class="dev2-chip purple">⚖️ imbalanced-learn</span>
+                <span class="dev2-chip purple">📊 matplotlib</span>
+                <span class="dev2-chip orange">🐼 pandas</span>
+            </div>
+            """, unsafe_allow_html=True)
+
+            st.markdown('<div class="dev-center"><h3 style="margin:1rem 0 .5rem 0;">🔗 ลิงก์ที่เกี่ยวข้อง</h3></div>', unsafe_allow_html=True)
+            st.markdown("- 🌐 [GitHub Profile](https://github.com/aomaem21100-maker?tab=repositories)\n"
+                        "- 📦 [Source Code โปรเจกต์นี้](https://github.com/aomaem21100-maker)\n"
+                        "- 📚 [Dataset: Credit Card Fraud Detection (Kaggle)](https://www.kaggle.com/mlg-ulb/creditcardfraud)")
+
+        st.markdown("---")
+        st.caption("© 2568 • Machine Learning Hub")
