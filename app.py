@@ -13,139 +13,177 @@ st.set_page_config(page_title="Machine Learning Hub", page_icon="🤖", layout="
 st.session_state.setdefault("models", None)
 st.session_state.setdefault("scaler", None)
 
-# ==================== CYBER DARK THEME ====================
+# ==================== EVANGELION THEME ====================
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Orbitron:wght@500;700&family=Inter:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Orbitron:wght@500;700;900&family=Inter:wght@400;600;700&display=swap');
 
-/* ===== พื้นหลังหลัก + ลายกริด ===== */
+/* ===== Palette: EVA Unit-01 / NERV =====
+   sidebar   : #D4D2F2
+   bg main   : #293242
+   purple    : #6A3AB2 (Unit-01)
+   neon green: #39FF14 (terminal)
+   orange    : #FF7A00 (NERV/hazard)
+   red       : #FF2A2A (emergency)
+====================================== */
+
+/* ===== พื้นหลังหลัก #293242 + กริดเรืองแสง ===== */
 div[data-testid="stAppViewContainer"] > section.main {
-    background-color: #0A101C;
+    background-color: #293242;
     background-image:
-        linear-gradient(rgba(45,224,200,0.045) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(45,224,200,0.045) 1px, transparent 1px);
+        linear-gradient(rgba(57,255,20,0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(57,255,20,0.05) 1px, transparent 1px);
     background-size: 42px 42px;
 }
 #MainMenu, header, footer { visibility: hidden; }
 
-/* ===== Sidebar ===== */
+/* ===== Sidebar #D4D2F2 ===== */
 section[data-testid="stSidebar"] {
-    background: #0D1526;
-    border-right: 1px solid #16233C;
+    background: #D4D2F2;
+    border-right: 2px solid #6A3AB2;
 }
+section[data-testid="stSidebar"] p,
+section[data-testid="stSidebar"] span,
+section[data-testid="stSidebar"] label { color: #1A1A2E; }
+
 .hub-title {
     font-family: 'Orbitron', 'IBM Plex Sans Thai', sans-serif;
-    background: linear-gradient(90deg, #2DE0C8, #8B5CF6);
+    background: linear-gradient(90deg, #000000 0%, #2E2E3E 60%, #4A4A5E 100%);
     -webkit-background-clip: text; background-clip: text; color: transparent;
-    letter-spacing: 3px; font-weight: 700; font-size: 1.05rem;
+    letter-spacing: 3px; font-weight: 900; font-size: 1.05rem;
 }
-.hub-hr { border: none; height: 1px; background: #1C2B47; margin: .9rem 0 1.2rem 0; }
+.hub-hr {
+    border: none; height: 3px; margin: .9rem 0 1.2rem 0;
+    background: repeating-linear-gradient(45deg, #FF7A00 0 10px, #14141E 10px 20px);
+}
 
-/* ===== เมนูนำทาง (radio → nav item) ===== */
+/* ===== เมนูนำทาง ===== */
 section[data-testid="stSidebar"] div[role="radiogroup"] input[type="radio"] { display: none; }
 section[data-testid="stSidebar"] div[role="radiogroup"] label {
-    display: block; padding: .75rem 1rem; border-radius: 10px;
-    color: #8FA3C4; font-weight: 500; cursor: pointer;
+    display: block; padding: .75rem 1rem; border-radius: 8px;
+    color: #3A3A55; font-weight: 600; cursor: pointer;
     border-left: 3px solid transparent; margin-bottom: .35rem;
     transition: all .2s ease;
 }
-section[data-testid="stSidebar"] div[role="radiogroup"] label:hover { color: #E6EDF7; }
+section[data-testid="stSidebar"] div[role="radiogroup"] label:hover { color: #000000; background: rgba(106,58,178,.12); }
 section[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) {
-    background: linear-gradient(90deg, rgba(23,195,178,.28), rgba(123,47,247,.28));
-    border-left: 3px solid #2DE0C8;
-    color: #FFFFFF;
+    background: linear-gradient(90deg, #14141E, #2A2A3A);
+    border-left: 3px solid #39FF14;
+    color: #39FF14;
+    font-family: 'Orbitron', 'IBM Plex Sans Thai', sans-serif;
+    letter-spacing: .5px;
 }
 
-/* ===== ข้อความ ===== */
+/* ===== ข้อความหลัก ===== */
 html, body, [class*="css"] { font-family: 'IBM Plex Sans Thai', 'Inter', sans-serif; }
-h1,h2,h3,h4 { color: #E6EDF7; font-weight: 600; }
-p, li { color: #C7D3E8; }
-caption, small { color: #7C8DB0 !important; }
+h1,h2,h3,h4 { color: #F2F5FB; font-weight: 600; }
+p, li { color: #D5DCEA; }
+caption, small { color: #93A1B8 !important; }
 
 .grad-title {
     font-size: 2.3rem; font-weight: 800;
-    background: linear-gradient(90deg, #2DE0C8 0%, #4CC9F0 45%, #8B5CF6 100%);
+    background: linear-gradient(90deg, #39FF14 0%, #7EF29A 35%, #6A3AB2 80%, #FF7A00 100%);
     -webkit-background-clip: text; background-clip: text; color: transparent;
+    text-shadow: 0 0 24px rgba(57,255,20,.25);
 }
 .tag-cyber {
     display: inline-block; font-family: 'Orbitron', sans-serif;
-    font-size: .68rem; letter-spacing: 2.5px; color: #2DE0C8;
-    border: 1px solid rgba(45,224,200,.5); border-radius: 4px;
+    font-size: .68rem; letter-spacing: 2.5px; color: #39FF14;
+    border: 1px solid rgba(57,255,20,.6); border-radius: 4px;
     padding: .25rem .7rem; margin-bottom: .6rem;
+    background: rgba(57,255,20,.08);
 }
 
 /* ===== การ์ด ===== */
 div[data-testid="stVerticalBlockBorderWrapper"] {
-    background: #0F1930; border: 1px solid #1C2B47; border-radius: 16px;
-    box-shadow: 0 2px 12px rgba(0,0,0,.35);
+    background: #212B3B; border: 1px solid #3A465C; border-radius: 14px;
+    box-shadow: 0 2px 14px rgba(0,0,0,.35);
 }
 
 /* ===== Metrics ===== */
 div[data-testid="stMetric"] {
-    background: #0F1930; border: 1px solid #1C2B47;
-    border-left: 3px solid #2DE0C8; border-radius: 12px; padding: 1rem 1.2rem;
+    background: #212B3B; border: 1px solid #3A465C;
+    border-left: 4px solid #FF7A00; border-radius: 10px; padding: 1rem 1.2rem;
 }
-div[data-testid="stMetric"] label { color: #7C8DB0 !important; font-size: .78rem; font-weight: 600; letter-spacing: .5px; }
-div[data-testid="stMetric"] div[data-testid="stMetricValue"] { color: #2DE0C8; font-weight: 700; }
+div[data-testid="stMetric"] label { color: #93A1B8 !important; font-size: .78rem; font-weight: 600; letter-spacing: .5px; }
+div[data-testid="stMetric"] div[data-testid="stMetricValue"] { color: #39FF14; font-weight: 700; text-shadow: 0 0 12px rgba(57,255,20,.35); }
 
 /* ===== Tabs ===== */
-div[data-testid="stTabs"] ul { gap: 0; border-bottom: 1px solid #1C2B47; background: transparent; }
+div[data-testid="stTabs"] ul { gap: 0; border-bottom: 1px solid #3A465C; background: transparent; }
 div[data-testid="stTabs"] button {
-    background: transparent; color: #7C8DB0; border-radius: 0;
+    background: transparent; color: #93A1B8; border-radius: 0;
     font-weight: 500; padding: .7rem 1.3rem; border: none;
     border-bottom: 3px solid transparent;
 }
 div[data-testid="stTabs"] button[aria-selected="true"] {
-    color: #2DE0C8; border-bottom: 3px solid #2DE0C8;
-    font-weight: 600; background: transparent; box-shadow: none;
+    color: #39FF14; border-bottom: 3px solid #39FF14;
+    font-weight: 700; background: transparent; box-shadow: none;
+    text-shadow: 0 0 10px rgba(57,255,20,.4);
 }
-div[data-testid="stTabs"] button:hover { color: #2DE0C8; background: transparent; }
+div[data-testid="stTabs"] button:hover { color: #39FF14; background: transparent; }
 
-/* ===== ปุ่ม gradient ===== */
+/* ===== ปุ่ม neon green (EVA terminal) ===== */
 div.stButton > button {
-    background: linear-gradient(90deg, #17C3B2, #7B2FF7);
-    color: #FFFFFF; border: none; border-radius: 10px;
-    font-weight: 600; padding: .55rem 1.8rem;
-    box-shadow: 0 2px 10px rgba(23,195,178,.25);
+    background: #39FF14; color: #0A0A0A; border: none; border-radius: 8px;
+    font-weight: 700; padding: .55rem 1.8rem;
+    font-family: 'Orbitron', 'IBM Plex Sans Thai', sans-serif;
+    letter-spacing: .5px;
+    box-shadow: 0 0 14px rgba(57,255,20,.35), inset 0 0 0 1px rgba(0,0,0,.25);
     transition: all .2s ease;
 }
-div.stButton > button:hover { filter: brightness(1.15); transform: translateY(-1px); }
+div.stButton > button:hover {
+    background: #52FF33; transform: translateY(-1px);
+    box-shadow: 0 0 22px rgba(57,255,20,.55);
+}
 
 /* ===== Inputs ===== */
 input, textarea {
-    background: #0F1930 !important; border: 1px solid #24344F !important;
-    color: #E6EDF7 !important; border-radius: 8px !important;
+    background: #212B3B !important; border: 1px solid #3A465C !important;
+    color: #F2F5FB !important; border-radius: 8px !important;
 }
-input:focus, textarea:focus { border-color: #2DE0C8 !important; box-shadow: 0 0 0 3px rgba(45,224,200,.12) !important; }
-div[data-baseweb="select"] > div { background: #0F1930 !important; border: 1px solid #24344F !important; color: #E6EDF7 !important; }
+input:focus, textarea:focus {
+    border-color: #39FF14 !important;
+    box-shadow: 0 0 0 3px rgba(57,255,20,.15) !important;
+}
+div[data-baseweb="select"] > div { background: #212B3B !important; border: 1px solid #3A465C !important; color: #F2F5FB !important; }
 
 /* ===== Progress / Alert / Expander ===== */
-div[data-testid="stProgress"] > div { background: #16233C; border-radius: 6px; }
-div[data-testid="stProgress"] > div > div { background: linear-gradient(90deg, #17C3B2, #7B2FF7); border-radius: 6px; }
-div[data-testid="stAlert"] { background: #0F1930; border: 1px solid #1C2B47; border-radius: 12px; color: #C7D3E8; }
-div[data-testid="stExpander"] { background: #0F1930; border: 1px solid #1C2B47; border-radius: 12px; }
+div[data-testid="stProgress"] > div { background: #1A2230; border-radius: 4px; }
+div[data-testid="stProgress"] > div > div {
+    background: linear-gradient(90deg, #39FF14, #6A3AB2);
+    border-radius: 4px;
+    box-shadow: 0 0 12px rgba(57,255,20,.4);
+}
+div[data-testid="stAlert"] { background: #212B3B; border: 1px solid #3A465C; border-radius: 10px; color: #D5DCEA; }
+div[data-testid="stExpander"] { background: #212B3B; border: 1px solid #3A465C; border-radius: 10px; }
 
-hr { border-color: #1C2B47 !important; }
-img { border-radius: 12px; border: 1px solid #1C2B47; }
+hr { border-color: #3A465C !important; }
+img { border-radius: 10px; border: 1px solid #3A465C; }
+
+/* ===== Hazard line (NERV) ===== */
+.hazard-line {
+    height: 4px; border-radius: 2px; margin: .5rem 0 1rem 0;
+    background: repeating-linear-gradient(45deg, #FF7A00 0 12px, #14141E 12px 24px);
+}
 
 /* ===== Developer Page ===== */
 .info-row { display: flex; gap: .6rem; padding: .4rem 0; font-size: .95rem; }
-.info-row .label { color: #7C8DB0; min-width: 140px; }
-.info-row .value { color: #E6EDF7; font-weight: 600; }
+.info-row .label { color: #93A1B8; min-width: 140px; }
+.info-row .value { color: #F2F5FB; font-weight: 600; }
 .tech-chip {
     display: inline-block; margin: .2rem .35rem .2rem 0; padding: .4rem .9rem;
-    border-radius: 999px; border: 1px solid rgba(45,224,200,.6);
-    color: #2DE0C8; font-size: .82rem; font-weight: 600;
+    border-radius: 999px; border: 1px solid rgba(57,255,20,.6);
+    color: #39FF14; font-size: .82rem; font-weight: 600;
+    background: rgba(57,255,20,.06);
 }
 .avatar-box {
     width: 110px; height: 110px; border-radius: 50%;
-    background: linear-gradient(135deg, rgba(23,195,178,.25), rgba(123,47,247,.25));
-    border: 2px solid #2DE0C8;
+    background: linear-gradient(135deg, rgba(106,58,178,.4), rgba(57,255,20,.25));
+    border: 2px solid #6A3AB2;
     display: flex; align-items: center; justify-content: center;
     font-size: 3rem;
+    box-shadow: 0 0 18px rgba(106,58,178,.5);
 }
-.cyber-link { color: #2DE0C8; text-decoration: none; font-weight: 600; }
-.cyber-link:hover { text-decoration: underline; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -221,8 +259,9 @@ page = st.sidebar.radio("นำทาง", ["หน้าหลัก", "ผู�
 #                         หน้าหลัก
 # ================================================================
 if page == "หน้าหลัก":
-    st.markdown('<span class="tag-cyber">🤖 MACHINE LEARNING PROJECT</span>', unsafe_allow_html=True)
+    st.markdown('<span class="tag-cyber">MACHINE LEARNING PROJECT</span>', unsafe_allow_html=True)
     st.markdown('<div class="grad-title">ระบบตรวจจับธุรกรรมที่น่าสงสัย</div>', unsafe_allow_html=True)
+    st.markdown('<div class="hazard-line"></div>', unsafe_allow_html=True)
     st.caption("🔍 การจำแนกธุรกรรมปกติและธุรกรรมทุจริตด้วยเทคนิคการเรียนรู้ของเครื่อง")
 
     st.markdown("")
@@ -368,9 +407,9 @@ if page == "หน้าหลัก":
 #                         ผู้พัฒนา
 # ================================================================
 else:
-    st.markdown('<span class="tag-cyber">👤 DEVELOPER</span>', unsafe_allow_html=True)
+    st.markdown('<span class="tag-cyber">DEVELOPER</span>', unsafe_allow_html=True)
     st.markdown('<div class="grad-title">ผู้พัฒนาโปรเจกต์</div>', unsafe_allow_html=True)
-    st.markdown("")
+    st.markdown('<div class="hazard-line"></div>', unsafe_allow_html=True)
 
     with st.container(border=True):
         a1, a2 = st.columns([1, 2], gap="large")
@@ -409,4 +448,4 @@ else:
                     "- 📚 [Dataset: Credit Card Fraud Detection (Kaggle)](https://www.kaggle.com/mlg-ulb/creditcardfraud)")
 
     st.markdown("---")
-    st.caption("© 2568 • Machine Learning Hub 💙")
+    st.caption("© 2568 • Machine Learning Hub")
