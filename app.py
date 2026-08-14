@@ -22,11 +22,23 @@ html, body, [class*="css"] { font-family: 'IBM Plex Sans Thai', 'Inter', sans-se
 div[data-testid="stAppViewContainer"], section.main, .stApp { background: #E3EBFD; }
 #MainMenu, header, footer { visibility: hidden; }
 
-h1, h2, h3, h4 { color: #1A1F36; font-weight: 600; letter-spacing: -0.3px; }
+/* ✅ ข้อความหลักสีดำ */
+h1, h2, h3, h4 { color: #111827; font-weight: 600; letter-spacing: -0.3px; }
 h1 { font-size: 2rem; font-weight: 700; }
 h2 { font-size: 1.35rem; }
 h3 { font-size: 1.1rem; }
-p, li, span { color: #1A1F36; }
+p, li { color: #111827; }
+
+/* ✅ บังคับข้อความใน Dialog/Modal เป็นสีดำทั้งหมด */
+div[data-testid="stModal"] h1, div[data-testid="stModal"] h2,
+div[data-testid="stModal"] h3, div[data-testid="stModal"] h4,
+div[data-testid="stModal"] p,  div[data-testid="stModal"] li,
+div[data-testid="stModal"] span {
+    color: #111827 !important;
+}
+div[data-testid="stModal"] h3, div[data-testid="stModal"] h4 {
+    font-weight: 700 !important;
+}
 
 div[data-testid="stVerticalBlockBorderWrapper"] {
     background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 16px;
@@ -37,11 +49,11 @@ div[data-testid="stMetric"] {
     padding: 1rem 1.2rem; box-shadow: none;
 }
 div[data-testid="stMetric"] label {
-    color: #6B7280 !important; font-size: 0.75rem; font-weight: 500;
+    color: #374151 !important; font-size: 0.75rem; font-weight: 600;
     text-transform: uppercase; letter-spacing: 0.8px;
 }
 div[data-testid="stMetric"] div[data-testid="stMetricValue"] {
-    color: #1A1F36; font-weight: 700; font-size: 1.6rem;
+    color: #111827; font-weight: 700; font-size: 1.6rem;
 }
 
 div[data-testid="stTabs"] ul {
@@ -49,7 +61,7 @@ div[data-testid="stTabs"] ul {
     border-bottom: 1px solid #D1D5DB;
 }
 div[data-testid="stTabs"] button {
-    background: transparent; color: #6B7280; border-radius: 0;
+    background: transparent; color: #4B5563; border-radius: 0;
     font-weight: 500; padding: 0.7rem 1.2rem; border: none;
     border-bottom: 2px solid transparent;
 }
@@ -71,11 +83,7 @@ div.stButton > button:hover {
 
 input, textarea {
     border-radius: 8px !important; border: 1px solid #D1D5DB !important;
-    padding: 0.5rem 0.8rem !important;
-}
-input:focus, textarea:focus {
-    border-color: #3B5BDB !important;
-    box-shadow: 0 0 0 3px rgba(59, 91, 219, 0.1) !important;
+    padding: 0.5rem 0.8rem !important; color: #111827 !important;
 }
 div[data-baseweb="select"] > div {
     border-radius: 8px !important; border: 1px solid #D1D5DB !important;
@@ -83,10 +91,7 @@ div[data-baseweb="select"] > div {
 
 div[data-testid="stProgress"] > div { background: #E3EBFD; border-radius: 6px; }
 div[data-testid="stProgress"] > div > div { background: #3B5BDB; border-radius: 6px; }
-
-div[data-testid="stExpander"] {
-    border-radius: 10px; background: #FFFFFF; border: 1px solid #E5E7EB;
-}
+div[data-testid="stExpander"] { border-radius: 10px; background: #FFFFFF; border: 1px solid #E5E7EB; }
 
 .risk-fraud, .risk-normal {
     padding: 0.4rem 0.9rem; border-radius: 20px; font-weight: 600;
@@ -95,66 +100,91 @@ div[data-testid="stExpander"] {
 .risk-fraud  { background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5; }
 .risk-normal { background: #D1FAE5; color: #065F46; border: 1px solid #6EE7B7; }
 
+/* ✅ การ์ดผู้พัฒนา (สมดุล) */
 .dev-card {
     background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 16px;
-    padding: 1.2rem; display: flex; flex-direction: column; gap: 0.8rem;
+    padding: 1rem;
 }
-.dev-photo {
-    width: 64px; height: 64px; border-radius: 50%; object-fit: cover;
-    border: 2px solid #E3EBFD; background: #E3EBFD;
+.dev-photo-img {
+    width: 100%; aspect-ratio: 1; object-fit: cover;
+    border-radius: 14px; border: 3px solid #E3EBFD;
+}
+.photo-placeholder {
+    width: 100%; aspect-ratio: 1; background: #E3EBFD; border-radius: 14px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 1.8rem; color: #3B5BDB;
+    font-size: 3rem; color: #3B5BDB;
 }
-.dev-name { font-weight: 600; color: #1A1F36; font-size: 0.95rem; margin: 0; }
-.dev-id { color: #6B7280; font-size: 0.8rem; margin: 0; }
-.dev-buttons { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem; }
+.dev-name-center { text-align: center; font-weight: 700; color: #111827; margin-top: .6rem; font-size: .95rem; }
+.dev-id-center   { text-align: center; color: #111827; font-size: .82rem; margin-top: .15rem; }
+
 .dev-btn {
     background: #E3EBFD; color: #3B5BDB; border: none;
-    padding: 0.4rem 0.8rem; border-radius: 8px; font-size: 0.8rem;
-    font-weight: 500; cursor: pointer; display: inline-flex;
-    align-items: center; gap: 0.3rem; text-decoration: none; transition: all 0.2s ease;
+    padding: 0.45rem 0.8rem; border-radius: 8px; font-size: 0.82rem;
+    font-weight: 600; display: flex; align-items: center; justify-content: center;
+    gap: 0.3rem; text-decoration: none; transition: all 0.2s ease; margin-top: .5rem;
 }
 .dev-btn:hover { background: #3B5BDB; color: #FFFFFF; }
+
+/* ✅ ป้ายเทคโนโลยีสูงเท่ากัน (สมดุล) */
+.tech-badge {
+    background: #E3EBFD; color: #3B5BDB; font-weight: 600;
+    min-height: 3.6rem; display: flex; align-items: center; justify-content: center;
+    text-align: center; border-radius: 10px; padding: .4rem .5rem; font-size: .85rem;
+}
+
+/* ✅ แถวข้อมูล: ป้าย + ค่า สีดำ */
+.info-row { display: flex; gap: 0.6rem; padding: 0.35rem 0; font-size: 0.92rem; }
+.info-row .label { color: #111827; min-width: 130px; font-weight: 600; }
+.info-row .value { color: #111827; font-weight: 500; }
 
 .tag-project {
     display: inline-block; background: #FFFFFF; color: #3B5BDB;
     font-size: 0.7rem; letter-spacing: 1.5px; padding: 0.25rem 0.7rem;
     border-radius: 6px; font-weight: 600; border: 1px solid #A5B4FC; margin-bottom: 0.5rem;
 }
-.header-line {
-    width: 48px; height: 3px; background: #3B5BDB;
-    border-radius: 2px; margin: 0.5rem 0 1rem 0;
-}
-.info-row { display: flex; gap: 0.5rem; padding: 0.3rem 0; font-size: 0.9rem; }
-.info-row .label { color: #6B7280; min-width: 100px; }
-.info-row .value { color: #1A1F36; font-weight: 500; }
+.header-line { width: 48px; height: 3px; background: #3B5BDB; border-radius: 2px; margin: 0.5rem 0 1rem 0; }
 
-div[data-testid="stDialog"] { background: #E3EBFD !important; }
-div[data-testid="stDialog"] > div {
-    background: #FFFFFF; border-radius: 20px; padding: 2rem; max-width: 500px;
-}
+div[data-testid="stModal"] { border-radius: 20px; }
 </style>
 """, unsafe_allow_html=True)
+
+# ==================== ✅ ค้นหารูปอัตโนมัติ (แก้รูปไม่ขึ้น) ====================
+def find_photo():
+    """ค้นหารูปโปรไฟล์ในโฟลเดอร์อัตโนมัติ ไม่ว่าตั้งชื่ออะไร"""
+    try:
+        files = os.listdir(".")
+    except Exception:
+        return None
+    preferred = ["my_photo.jpg", "my_photo.png", "photo.jpg", "photo.png",
+                 "profile.jpg", "profile.png", "me.jpg", "me.png"]
+    for name in preferred:
+        if name in files:
+            return name
+    exclude = ("compare", "cm", "roc", "pr_curve", "confusion", "icon", "logo")
+    for f in sorted(files):
+        if f.lower().endswith((".jpg", ".jpeg", ".png", ".webp")) \
+           and not any(k in f.lower() for k in exclude):
+            return f
+    return None
+
+PHOTO = find_photo()
 
 # ==================== Dialog ผู้พัฒนา ====================
 @st.dialog("👤 ข้อมูลผู้พัฒนา", width="large")
 def show_developer_info():
-    col1, col2 = st.columns([1, 2])
+    col1, col2 = st.columns([1, 2], gap="large")
     with col1:
-        if os.path.exists("my_photo.jpg"):
-            st.image("my_photo.jpg", use_container_width=True)
+        if PHOTO:
+            st.image(PHOTO, use_container_width=True)
         else:
-            st.markdown("""
-            <div style="width:100%; aspect-ratio:1; background:#E3EBFD; border-radius:16px;
-                        display:flex; align-items:center; justify-content:center; font-size:4rem; color:#3B5BDB;">
-                👤
-            </div>
-            """, unsafe_allow_html=True)
+            st.markdown('<div class="photo-placeholder">👤</div>', unsafe_allow_html=True)
+        st.markdown('<div class="dev-name-center">นาย จตุรภัทร สถาปีตานนท์</div>', unsafe_allow_html=True)
+        st.markdown('<div class="dev-id-center">🆔 664245024 • 📚 66/43</div>', unsafe_allow_html=True)
     with col2:
         st.markdown("### 📇 ข้อมูลส่วนตัว")
         st.markdown("""
         <div class="info-row"><span class="label">🆔 รหัสนักศึกษา</span><span class="value">664245024</span></div>
-        <div class="info-row"><span class="label">👤 ชื่อ-นามสกุล</span><span class="value">นาย จตุรภัทร สถาปิตานนท์</span></div>
+        <div class="info-row"><span class="label">👤 ชื่อ-นามสกุล</span><span class="value">นาย จตุรภัทร สถาปีตานนท์</span></div>
         <div class="info-row"><span class="label">📚 หมู่เรียน</span><span class="value">66/43</span></div>
         <div class="info-row"><span class="label">🎓 สาขา</span><span class="value">วิทยาการคอมพิวเตอร์</span></div>
         """, unsafe_allow_html=True)
@@ -165,11 +195,10 @@ def show_developer_info():
              "เทคนิคการเรียนรู้ของเครื่องในการตรวจจับธุรกรรมบัตรเครดิตที่น่าสงสัย")
 
     st.markdown("### 🛠️ เทคโนโลยีที่ใช้")
-    tech_cols = st.columns(4)
-    tech_emojis = ["🐍 Python", "🤖 scikit-learn", "🚀 Streamlit", "⚖️ imbalanced-learn"]
-    for i, tech in enumerate(tech_emojis):
+    tech_cols = st.columns(4, gap="small")
+    for i, tech in enumerate(["🐍 Python", "🤖 scikit-learn", "🚀 Streamlit", "⚖️ imbalanced-learn"]):
         with tech_cols[i]:
-            st.markdown(f"<div style='background:#E3EBFD; padding:0.5rem; border-radius:8px; text-align:center; color:#3B5BDB; font-weight:500;'>{tech}</div>", unsafe_allow_html=True)
+            st.markdown(f'<div class="tech-badge">{tech}</div>', unsafe_allow_html=True)
 
     st.markdown("### 🔗 ลิงก์ที่เกี่ยวข้อง")
     st.markdown("- 🌐 [GitHub Profile](https://github.com/aomaem21100-maker?tab=repositories)\n"
@@ -233,25 +262,20 @@ with h1:
     st.caption("🔍 การจำแนกธุรกรรมปกติและธุรกรรมทุจริตด้วยเทคนิคการเรียนรู้ของเครื่อง")
 
 with h2:
-    st.markdown("""
-    <div class="dev-card">
-        <div style="display:flex; align-items:center; gap:0.8rem;">
-            <div class="dev-photo">👤</div>
-            <div>
-                <p class="dev-name">🧑‍💻 ผู้พัฒนาโปรเจกต์</p>
-                <p class="dev-id">🆔 รหัส 63xxxxxxxx</p>
-            </div>
-        </div>
-        <div class="dev-buttons">
-            <a href="https://github.com/aomaem21100-maker?tab=repositories" target="_blank" class="dev-btn">
-                🔗 GitHub Profile
-            </a>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    if st.button("👤 ดูข้อมูลผู้พัฒนา", use_container_width=True):
-        show_developer_info()
+    with st.container(border=True):
+        pc1, pc2 = st.columns([1, 2], gap="medium")
+        with pc1:
+            if PHOTO:
+                st.image(PHOTO, use_container_width=True)
+            else:
+                st.markdown('<div class="photo-placeholder">👤</div>', unsafe_allow_html=True)
+        with pc2:
+            st.markdown("**🧑‍💻 ผู้พัฒนาโปรเจกต์**")
+            st.caption("นาย จตุรภัทร สถาปีตานนท์")
+            st.caption("🆔 664245024 • 📚 66/43")
+        if st.button("👤 ดูข้อมูลผู้พัฒนา", use_container_width=True):
+            show_developer_info()
+        st.markdown('<a class="dev-btn" href="https://github.com/aomaem21100-maker?tab=repositories" target="_blank">🔗 GitHub Profile</a>', unsafe_allow_html=True)
 
 # ==================== METRICS ====================
 st.markdown("")
@@ -265,11 +289,7 @@ st.markdown("")
 
 # ==================== TABS ====================
 t1, t2, t3, t4, t5 = st.tabs([
-    "🎯 ปัญหาและข้อมูล",
-    "🧹 Preprocessing",
-    "🤖 โมเดล",
-    "📊 การประเมินผล",
-    "🔮 ทดลองตรวจจับ"
+    "🎯 ปัญหาและข้อมูล", "🧹 Preprocessing", "🤖 โมเดล", "📊 การประเมินผล", "🔮 ทดลองตรวจจับ"
 ])
 
 with t1:
@@ -289,13 +309,13 @@ with t2:
         st.subheader("🧹 2.1 ขั้นตอนการเตรียมข้อมูล")
         st.markdown("""
         1️⃣ **การสุ่มตัวอย่าง** — ลดขนาดจาก 284,807 เป็น 20,000 รายการ แบบ Stratified
-        
+
         2️⃣ **การจัดการ Imbalance** — ใช้ SMOTE เพื่อเพิ่มจำนวน fraud samples ในชุดฝึก
-        
+
         3️⃣ **การปรับมาตราส่วน** — ใช้ StandardScaler กับ Amount และ Time
-        
+
         4️⃣ **การแบ่งข้อมูล** — Train/Test = 80:20 แบบ Stratified
-        
+
         5️⃣ **การเลือกเมตริก** — เน้น Precision, Recall, F1-Score
         """)
 
@@ -368,19 +388,16 @@ with t5:
                 v2 = st.number_input("🔢 V2 (PCA)", -50.0, 50.0, value=0.0)
 
             if st.button("🔍 ตรวจจับธุรกรรม", use_container_width=True):
-                # ✅ สร้าง Dictionary เพื่อจับคู่ชื่อคอลัมน์กับค่าให้ชัดเจน
                 inp_dict = {f"V{i}": 0.0 for i in range(1, 29)}
                 inp_dict["V1"] = float(v1)
                 inp_dict["V2"] = float(v2)
 
-                # Scale Amount และ Time
                 scaled = scaler.transform(
                     pd.DataFrame([[amount, time_val]], columns=["Amount", "Time"])
                 )[0]
                 inp_dict["Amount"] = float(scaled[0])
                 inp_dict["Time"] = float(scaled[1])
 
-                # ✅ บังคับลำดับคอลัมน์ให้ตรงกับตอนเทรนโมเดลเป๊ะๆ (V1..V28, Time, Amount)
                 train_columns = [f"V{i}" for i in range(1, 29)] + ["Time", "Amount"]
                 inp = pd.DataFrame([inp_dict])[train_columns]
 
