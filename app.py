@@ -32,7 +32,6 @@ st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Orbitron:wght@500;700;900&family=Inter:wght@400;600;700&display=swap');
 
-/* พื้นหลังหลัก #293242 + กริดเรืองแสง */
 div[data-testid="stAppViewContainer"] > section.main {
     background-color: #293242;
     background-image:
@@ -42,7 +41,7 @@ div[data-testid="stAppViewContainer"] > section.main {
 }
 #MainMenu, header, footer { visibility: hidden; }
 
-/* ===== Sidebar #D4D2F2 + ชื่อ gradient ดำ ===== */
+/* Sidebar #D4D2F2 + ชื่อ gradient ดำ */
 section[data-testid="stSidebar"] { background: #D4D2F2; border-right: 2px solid #6A3AB2; }
 section[data-testid="stSidebar"] p,
 section[data-testid="stSidebar"] span,
@@ -71,7 +70,6 @@ section[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked)
     font-family: 'Orbitron', 'IBM Plex Sans Thai', sans-serif;
 }
 
-/* ข้อความ */
 html, body, [class*="css"] { font-family: 'IBM Plex Sans Thai', 'Inter', sans-serif; }
 h1,h2,h3,h4 { color: #F2F5FB; font-weight: 600; }
 p, li { color: #D5DCEA; }
@@ -90,7 +88,6 @@ caption, small { color: #93A1B8 !important; }
     padding: .25rem .7rem; margin-bottom: .6rem; background: rgba(57,255,20,.08);
 }
 
-/* การ์ด / Metrics */
 div[data-testid="stVerticalBlockBorderWrapper"] {
     background: #212B3B; border: 1px solid #3A465C; border-radius: 14px;
     box-shadow: 0 2px 14px rgba(0,0,0,.35);
@@ -104,7 +101,6 @@ div[data-testid="stMetric"] div[data-testid="stMetricValue"] {
     color: #39FF14; font-weight: 700; text-shadow: 0 0 12px rgba(57,255,20,.35);
 }
 
-/* Tabs */
 div[data-testid="stTabs"] ul { gap: 0; border-bottom: 1px solid #3A465C; background: transparent; }
 div[data-testid="stTabs"] button {
     background: transparent; color: #93A1B8; border-radius: 0; font-weight: 500;
@@ -116,7 +112,6 @@ div[data-testid="stTabs"] button[aria-selected="true"] {
 }
 div[data-testid="stTabs"] button:hover { color: #39FF14; background: transparent; }
 
-/* ปุ่ม neon */
 div.stButton > button {
     background: #39FF14; color: #0A0A0A; border: none; border-radius: 8px;
     font-weight: 700; padding: .55rem 1.8rem;
@@ -125,7 +120,6 @@ div.stButton > button {
 }
 div.stButton > button:hover { background: #52FF33; box-shadow: 0 0 22px rgba(57,255,20,.55); }
 
-/* Inputs */
 input, textarea {
     background: #212B3B !important; border: 1px solid #3A465C !important;
     color: #F2F5FB !important; border-radius: 8px !important;
@@ -133,7 +127,6 @@ input, textarea {
 input:focus, textarea:focus { border-color: #39FF14 !important; box-shadow: 0 0 0 3px rgba(57,255,20,.15) !important; }
 div[data-baseweb="select"] > div { background: #212B3B !important; border: 1px solid #3A465C !important; color: #F2F5FB !important; }
 
-/* Progress / Alert / Expander */
 div[data-testid="stProgress"] > div { background: #1A2230; border-radius: 4px; }
 div[data-testid="stProgress"] > div > div {
     background: linear-gradient(90deg, #39FF14, #6A3AB2); border-radius: 4px;
@@ -251,10 +244,10 @@ def train_now(key):
             st.session_state["eval"] = build_and_eval()
         st.rerun()
 
-# ==================== SIDEBAR ====================
+# ==================== ✅ ระบบนำทาง (สลับหน้า + ย้อนกลับ) ====================
 st.sidebar.markdown('<div class="hub-title">MACHINE LEARNING HUB</div>', unsafe_allow_html=True)
 st.sidebar.markdown('<hr class="hub-hr">', unsafe_allow_html=True)
-page = st.sidebar.radio("นำทาง", ["หน้าหลัก", "ผู้พัฒนา"], label_visibility="collapsed")
+page = st.sidebar.radio("นำทาง", ["หน้าหลัก", "ผู้พัฒนา"], label_visibility="collapsed", key="nav")
 
 EV = st.session_state.get("eval", None)
 
@@ -279,6 +272,10 @@ if page == "หน้าหลัก":
                 st.markdown("**นาย จตุรภัทร สถาปีตานนท์**")
                 st.caption("🆔 664245024")
                 st.caption("📚 หมู่เรียน 66/43")
+            # ✅ ปุ่มไปหน้าผู้พัฒนา
+            if st.button("👤 ดูหน้าผู้พัฒนา", use_container_width=True):
+                st.session_state["nav"] = "ผู้พัฒนา"
+                st.rerun()
 
     m1, m2, m3, m4 = st.columns(4)
     m1.metric("📊 ขนาดข้อมูล", "20,000 รายการ")
@@ -405,12 +402,19 @@ if page == "หน้าหลัก":
     st.caption("📚 จัดทำเพื่อประกอบการเรียนวิชา Machine Learning • 🛠️ พัฒนาด้วย Python, scikit-learn, Streamlit")
 
 # ================================================================
-#            ผู้พัฒนา (โทนรูป 2: gradient ฟ้า→ม่วง บนกรมท่า)
+#     ผู้พัฒนา — หน้าแยกโทนรูป 2 (กรมท่าเข้ม + กริดฟ้า + ปุ่มย้อนกลับ)
 # ================================================================
 else:
     st.markdown("""
     <style>
-    /* การ์ดในหน้าผู้พัฒนาเป็นกรมท่าเข้มแบบรูป 2 */
+    /* ✅ เปลี่ยนพื้นหลังทั้งหน้าเป็นโทนรูป 2 ให้เห็นชัดว่าสลับหน้า */
+    div[data-testid="stAppViewContainer"] > section.main {
+        background-color: #0A101C;
+        background-image:
+            linear-gradient(rgba(45,224,200,0.045) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(45,224,200,0.045) 1px, transparent 1px);
+        background-size: 42px 42px;
+    }
     div[data-testid="stVerticalBlockBorderWrapper"] { background: #0D1526; border: 1px solid #16233C; }
 
     .dev2-title {
@@ -440,6 +444,13 @@ else:
     </style>
     """, unsafe_allow_html=True)
 
+    # ✅ ปุ่มย้อนกลับหน้าหลัก
+    bk, _ = st.columns([1, 3])
+    with bk:
+        if st.button("⬅️ ย้อนกลับหน้าหลัก", use_container_width=True):
+            st.session_state["nav"] = "หน้าหลัก"
+            st.rerun()
+
     st.markdown('<div class="dev2-title">👤 ผู้พัฒนาโปรเจกต์</div>', unsafe_allow_html=True)
     st.markdown('<hr class="dev2-line">', unsafe_allow_html=True)
 
@@ -453,7 +464,7 @@ else:
         with a2:
             st.markdown("""
             <div class="info-row"><span class="dev2-label">👤 ชื่อ-นามสกุล</span><span class="dev2-value">นาย จตุรภัทร สถาปีตานนท์</span></div>
-            <div class="info-row"><span class="dev2-label">🆔 รหัสนักศึกษา</span><span class="dev2-value">664245024</span></div>
+            <div class="info-row"><span class="dev2-label">🆔 รหัสนักศึกษา</span><span class="value" style="color:#E6EDF7; font-weight:600;">664245024</span></div>
             <div class="info-row"><span class="dev2-label">📚 หมู่เรียน</span><span class="dev2-value">66/43</span></div>
             <div class="info-row"><span class="dev2-label">🎓 สาขา</span><span class="dev2-value">วิทยาการคอมพิวเตอร์</span></div>
             <div class="info-row"><span class="dev2-label">🏫 อาจารย์ผู้สอน</span><span class="dev2-value">……………</span></div>
