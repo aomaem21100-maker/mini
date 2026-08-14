@@ -17,7 +17,6 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from imblearn.over_sampling import SMOTE
 
-# ✅ บังคับ Sidebar กางเสมอตอนเปิดเว็บ
 st.set_page_config(page_title="Machine Learning Hub", page_icon="🤖",
                    layout="wide", initial_sidebar_state="expanded")
 
@@ -43,7 +42,7 @@ div[data-testid="stAppViewContainer"] > section.main {
 }
 #MainMenu, header, footer { visibility: hidden; }
 
-/* ===== Sidebar (แถบซ้ายมือ) ===== */
+/* ===== Sidebar ===== */
 section[data-testid="stSidebar"] { background: #D4D2F2; border-right: 2px solid #6A3AB2; }
 section[data-testid="stSidebar"] p,
 section[data-testid="stSidebar"] span,
@@ -59,19 +58,22 @@ section[data-testid="stSidebar"] label { color: #1A1A2E; }
     border: none; height: 3px; margin: .9rem 0 1.2rem 0;
     background: repeating-linear-gradient(45deg, #FF7A00 0 10px, #14141E 10px 20px);
 }
-section[data-testid="stSidebar"] div[role="radiogroup"] input[type="radio"] { display: none; }
-section[data-testid="stSidebar"] div[role="radiogroup"] label {
-    display: block; padding: .8rem 1rem; border-radius: 8px;
-    color: #3A3A55; font-weight: 600; cursor: pointer;
-    border-left: 3px solid transparent; margin-bottom: .4rem; transition: all .2s ease;
+
+/* ✅ แก้ Sidebar selectbox ให้มองเห็นชัด คลิกง่าย */
+section[data-testid="stSidebar"] .stSelectbox { margin-top: 1rem; }
+section[data-testid="stSidebar"] .stSelectbox > div {
+    background: #FFFFFF !important;
+    border: 2px solid #6A3AB2 !important;
+    border-radius: 10px;
+    padding: 0.8rem 1rem;
+    font-size: 1rem; font-weight: 600; color: #1A1A2E !important;
 }
-section[data-testid="stSidebar"] div[role="radiogroup"] label:hover { color: #000; background: rgba(106,58,178,.12); }
-section[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) {
-    background: linear-gradient(90deg, #14141E, #2A2A3A);
-    border-left: 3px solid #39FF14; color: #39FF14;
-    font-family: 'Orbitron', 'IBM Plex Sans Thai', sans-serif;
+section[data-testid="stSidebar"] .stSelectbox > div:hover {
+    border-color: #39FF14 !important;
+    box-shadow: 0 0 12px rgba(57, 255, 20, 0.3);
 }
 
+/* ข้อความหลัก */
 html, body, [class*="css"] { font-family: 'IBM Plex Sans Thai', 'Inter', sans-serif; }
 h1,h2,h3,h4 { color: #F2F5FB; font-weight: 600; }
 p, li { color: #D5DCEA; }
@@ -121,6 +123,19 @@ div.stButton > button {
     box-shadow: 0 0 14px rgba(57,255,20,.35); transition: all .2s ease;
 }
 div.stButton > button:hover { background: #52FF33; box-shadow: 0 0 22px rgba(57,255,20,.55); }
+
+/* ✅ ปุ่มเมนูด้านบน (แถบ gradient) */
+.top-menu-btn > button {
+    background: linear-gradient(135deg, #39FF14, #6A3AB2) !important;
+    color: #0A0A0A !important;
+    font-weight: 700 !important;
+    font-size: 0.95rem !important;
+    font-family: 'Orbitron', 'IBM Plex Sans Thai', sans-serif !important;
+}
+.top-menu-btn > button:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 0 20px rgba(57, 255, 20, 0.5) !important;
+}
 
 input, textarea {
     background: #212B3B !important; border: 1px solid #3A465C !important;
@@ -238,26 +253,39 @@ def train_now(key):
             st.session_state["eval"] = build_and_eval()
         st.rerun()
 
-# ==================== ✅ แถบเมนู 2 ชั้น (Sidebar + แถบบนถาวร) ====================
+# ==================== ✅ แถบเมนู: Sidebar + แถบบน ====================
 st.sidebar.markdown('<div class="hub-title">MACHINE LEARNING HUB</div>', unsafe_allow_html=True)
 st.sidebar.markdown('<hr class="hub-hr">', unsafe_allow_html=True)
-st.session_state.setdefault("nav", "🏠 หน้าหลัก")
-page = st.sidebar.radio("นำทาง", ["🏠 หน้าหลัก", "👤 ผู้พัฒนา"],
-                        label_visibility="collapsed", key="nav")
+st.sidebar.markdown("### 📍 นำทาง")
+page = st.sidebar.selectbox(
+    "เลือกหน้า",
+    ["🏠 หน้าหลัก", "👤 ผู้พัฒนา"],
+    label_visibility="collapsed",
+    index=0,
+    key="sidebar_nav"
+)
 
-# ✅ แถบเมนูด้านบน — เห็นเสมอแม้ Sidebar ถูกพับ
-tb1, tb2, _ = st.columns([1.2, 1.2, 6])
+# แถบเมนูด้านบน (สำรอง)
+tb1, tb2, tb3 = st.columns([1.2, 1.2, 6])
 with tb1:
-    if st.button("🏠 หน้าหลัก", use_container_width=True, key="tb_home"):
-        st.session_state["nav"] = "🏠 หน้าหลัก"; st.rerun()
+    with st.container():
+        st.markdown('<div class="top-menu-btn">', unsafe_allow_html=True)
+        if st.button("🏠 หน้าหลัก", use_container_width=True, key="top_home"):
+            st.session_state["sidebar_nav"] = "🏠 หน้าหลัก"
+            st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
 with tb2:
-    if st.button("👤 ผู้พัฒนา", use_container_width=True, key="tb_dev"):
-        st.session_state["nav"] = "👤 ผู้พัฒนา"; st.rerun()
+    with st.container():
+        st.markdown('<div class="top-menu-btn">', unsafe_allow_html=True)
+        if st.button("👤 ผู้พัฒนา", use_container_width=True, key="top_dev"):
+            st.session_state["sidebar_nav"] = "👤 ผู้พัฒนา"
+            st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
 
 EV = st.session_state.get("eval", None)
 
 # ================================================================
-#              หน้าหลัก — เนื้อหาโปรเจกต์ล้วน
+#              หน้าหลัก — เนื้อหาโปรเจกต์
 # ================================================================
 if page == "🏠 หน้าหลัก":
     st.markdown('<span class="tag-cyber">MACHINE LEARNING PROJECT</span>', unsafe_allow_html=True)
