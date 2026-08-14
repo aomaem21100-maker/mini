@@ -7,6 +7,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+# ✅ Import ทั้งหมดไว้บนสุด (แก้ NameError)
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import (accuracy_score, precision_score, recall_score,
@@ -19,20 +20,21 @@ from imblearn.over_sampling import SMOTE
 
 st.set_page_config(page_title="Machine Learning Hub", page_icon="🤖", layout="wide")
 
+# ===== กราฟโทน Eva =====
 plt.rcParams.update({
     "figure.facecolor": "#212B3B", "axes.facecolor": "#212B3B",
     "axes.edgecolor": "#3A465C", "axes.labelcolor": "#D5DCEA",
     "text.color": "#D5DCEA", "xtick.color": "#93A1B8", "ytick.color": "#93A1B8",
-    "legend.facecolor": "#212B3B", "grid.color": "#3A465C", "font.size": 10,
+    "legend.facecolor": "#212B3B", "grid.color": "#3A465C",
+    "font.size": 10,
 })
 EVA_COLORS = ["#39FF14", "#6A3AB2", "#FF7A00", "#4CC9F0"]
 
-# ==================== THEME: Eva Main + Sidebar สไตล์รูป 2 ====================
+# ==================== EVANGELION THEME ====================
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Orbitron:wght@500;700;900&family=Inter:wght@400;600;700&display=swap');
 
-/* ===== พื้นหลังหลัก #293242 + กริดเรืองแสง ===== */
 div[data-testid="stAppViewContainer"] > section.main {
     background-color: #293242;
     background-image:
@@ -42,39 +44,35 @@ div[data-testid="stAppViewContainer"] > section.main {
 }
 #MainMenu, header, footer { visibility: hidden; }
 
-/* ===== ✅ SIDEBAR สไตล์รูป 2 (กรมท่าเข้ม + gradient cyan-purple) ===== */
-section[data-testid="stSidebar"] {
-    background: #0D1526;
-    border-right: 1px solid #16233C;
-}
+section[data-testid="stSidebar"] { background: #D4D2F2; border-right: 2px solid #6A3AB2; }
 section[data-testid="stSidebar"] p,
 section[data-testid="stSidebar"] span,
-section[data-testid="stSidebar"] label { color: #8FA3C4; }
+section[data-testid="stSidebar"] label { color: #1A1A2E; }
 
 .hub-title {
     font-family: 'Orbitron', 'IBM Plex Sans Thai', sans-serif;
-    background: linear-gradient(90deg, #2DE0C8, #8B5CF6);
+    background: linear-gradient(90deg, #000000 0%, #2E2E3E 60%, #4A4A5E 100%);
     -webkit-background-clip: text; background-clip: text; color: transparent;
-    letter-spacing: 3px; font-weight: 700; font-size: 1.05rem;
+    letter-spacing: 3px; font-weight: 900; font-size: 1.05rem;
 }
-.hub-hr { border: none; height: 1px; background: #1C2B47; margin: .9rem 0 1.2rem 0; }
+.hub-hr {
+    border: none; height: 3px; margin: .9rem 0 1.2rem 0;
+    background: repeating-linear-gradient(45deg, #FF7A00 0 10px, #14141E 10px 20px);
+}
 
-/* เมนูนำทาง: active = gradient teal→ม่วง + ขอบซ้าย cyan */
 section[data-testid="stSidebar"] div[role="radiogroup"] input[type="radio"] { display: none; }
 section[data-testid="stSidebar"] div[role="radiogroup"] label {
-    display: block; padding: .8rem 1rem; border-radius: 10px;
-    color: #8FA3C4; font-weight: 500; cursor: pointer;
-    border-left: 3px solid transparent; margin-bottom: .4rem;
-    transition: all .2s ease;
+    display: block; padding: .75rem 1rem; border-radius: 8px;
+    color: #3A3A55; font-weight: 600; cursor: pointer;
+    border-left: 3px solid transparent; margin-bottom: .35rem; transition: all .2s ease;
 }
-section[data-testid="stSidebar"] div[role="radiogroup"] label:hover { color: #E6EDF7; }
+section[data-testid="stSidebar"] div[role="radiogroup"] label:hover { color: #000; background: rgba(106,58,178,.12); }
 section[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) {
-    background: linear-gradient(90deg, rgba(23,195,178,.30), rgba(123,47,247,.30));
-    border-left: 3px solid #2DE0C8;
-    color: #FFFFFF; font-weight: 600;
+    background: linear-gradient(90deg, #14141E, #2A2A3A);
+    border-left: 3px solid #39FF14; color: #39FF14;
+    font-family: 'Orbitron', 'IBM Plex Sans Thai', sans-serif;
 }
 
-/* ===== ข้อความหลัก ===== */
 html, body, [class*="css"] { font-family: 'IBM Plex Sans Thai', 'Inter', sans-serif; }
 h1,h2,h3,h4 { color: #F2F5FB; font-weight: 600; }
 p, li { color: #D5DCEA; }
@@ -93,7 +91,6 @@ caption, small { color: #93A1B8 !important; }
     padding: .25rem .7rem; margin-bottom: .6rem; background: rgba(57,255,20,.08);
 }
 
-/* ===== การ์ด / Metrics ===== */
 div[data-testid="stVerticalBlockBorderWrapper"] {
     background: #212B3B; border: 1px solid #3A465C; border-radius: 14px;
     box-shadow: 0 2px 14px rgba(0,0,0,.35);
@@ -107,7 +104,6 @@ div[data-testid="stMetric"] div[data-testid="stMetricValue"] {
     color: #39FF14; font-weight: 700; text-shadow: 0 0 12px rgba(57,255,20,.35);
 }
 
-/* ===== Tabs ===== */
 div[data-testid="stTabs"] ul { gap: 0; border-bottom: 1px solid #3A465C; background: transparent; }
 div[data-testid="stTabs"] button {
     background: transparent; color: #93A1B8; border-radius: 0; font-weight: 500;
@@ -119,7 +115,6 @@ div[data-testid="stTabs"] button[aria-selected="true"] {
 }
 div[data-testid="stTabs"] button:hover { color: #39FF14; background: transparent; }
 
-/* ===== ปุ่ม neon ===== */
 div.stButton > button {
     background: #39FF14; color: #0A0A0A; border: none; border-radius: 8px;
     font-weight: 700; padding: .55rem 1.8rem;
@@ -128,7 +123,6 @@ div.stButton > button {
 }
 div.stButton > button:hover { background: #52FF33; box-shadow: 0 0 22px rgba(57,255,20,.55); }
 
-/* ===== Inputs ===== */
 input, textarea {
     background: #212B3B !important; border: 1px solid #3A465C !important;
     color: #F2F5FB !important; border-radius: 8px !important;
@@ -136,7 +130,6 @@ input, textarea {
 input:focus, textarea:focus { border-color: #39FF14 !important; box-shadow: 0 0 0 3px rgba(57,255,20,.15) !important; }
 div[data-baseweb="select"] > div { background: #212B3B !important; border: 1px solid #3A465C !important; color: #F2F5FB !important; }
 
-/* ===== Progress / Alert / Expander ===== */
 div[data-testid="stProgress"] > div { background: #1A2230; border-radius: 4px; }
 div[data-testid="stProgress"] > div > div {
     background: linear-gradient(90deg, #39FF14, #6A3AB2); border-radius: 4px;
@@ -153,7 +146,6 @@ img { border-radius: 10px; border: 1px solid #3A465C; }
     background: repeating-linear-gradient(45deg, #FF7A00 0 12px, #14141E 12px 24px);
 }
 
-/* ===== Developer ===== */
 .info-row { display: flex; gap: .6rem; padding: .4rem 0; font-size: .95rem; }
 .info-row .label { color: #93A1B8; min-width: 140px; }
 .info-row .value { color: #F2F5FB; font-weight: 600; }
@@ -198,6 +190,7 @@ def make_data(n=20000, seed=42):
     data["Class"] = np.random.choice([0, 1], n, p=[0.9983, 0.0017])
     return pd.DataFrame(data)
 
+# ==================== ฝึก + ประเมินผล (imports อยู่บนสุดแล้ว) ====================
 @st.cache_resource
 def build_and_eval():
     df = make_data(20000)
@@ -227,7 +220,9 @@ def build_and_eval():
     best_name = comp.sort_values("F1", ascending=False).iloc[0]["Model"]
     return trained, scaler, comp, best_name, np.array(y_te), preds, probas
 
+# ✅ ฟังก์ชันนี้ไม่ต้อง import อะไรเพิ่มแล้ว (มีอยู่บนสุด)
 def make_figures(comp, y_te, preds, probas, best_name):
+    # 1) กราฟแท่ง
     fig_bar, ax = plt.subplots(figsize=(9, 4.5))
     x = np.arange(len(comp)); w = .2
     for i, col in enumerate(["Accuracy", "Precision", "Recall", "F1"]):
@@ -235,6 +230,7 @@ def make_figures(comp, y_te, preds, probas, best_name):
     ax.set_xticks(x); ax.set_xticklabels(comp["Model"], rotation=8)
     ax.set_ylim(0, 1); ax.legend(); ax.set_title("Model Comparison"); ax.grid(axis="y", alpha=.3)
 
+    # 2) ROC Curve
     fig_roc, ax = plt.subplots(figsize=(7, 5))
     for i, (name, pr) in enumerate(probas.items()):
         fpr, tpr, _ = roc_curve(y_te, pr)
@@ -243,6 +239,7 @@ def make_figures(comp, y_te, preds, probas, best_name):
     ax.set_title("ROC Curve"); ax.set_xlabel("FPR"); ax.set_ylabel("TPR")
     ax.legend(loc="lower right")
 
+    # 3) Confusion Matrix
     cm = confusion_matrix(y_te, preds[best_name])
     fig_cm, ax = plt.subplots(figsize=(5.5, 4.5))
     im = ax.imshow(cm, cmap="Greens")
@@ -262,7 +259,7 @@ def train_now(key):
             st.session_state["eval"] = build_and_eval()
         st.rerun()
 
-# ==================== SIDEBAR (สไตล์รูป 2) ====================
+# ==================== SIDEBAR ====================
 st.sidebar.markdown('<div class="hub-title">MACHINE LEARNING HUB</div>', unsafe_allow_html=True)
 st.sidebar.markdown('<hr class="hub-hr">', unsafe_allow_html=True)
 page = st.sidebar.radio("นำทาง", ["หน้าหลัก", "ผู้พัฒนา"], label_visibility="collapsed")
@@ -295,7 +292,7 @@ if page == "หน้าหลัก":
     m1.metric("📊 ขนาดข้อมูล", "20,000 รายการ")
     m2.metric("🔢 คุณลักษณะ", "30 ตัว")
     m3.metric("🏆 โมเดลที่ดีที่สุด", EV[3] if EV else "–")
-    m4.metric("📈 คะแนน F1", f"{EV[2].sort_values('F1', ascending=False).iloc[0]['F1']:.2%}" if EV else "–")
+    m4.metric("📈 F1-Score", f"{EV[2].sort_values('F1', ascending=False).iloc[0]['F1']:.2%}" if EV else "–")
 
     st.markdown("")
 
@@ -434,7 +431,7 @@ else:
             <div class="info-row"><span class="label">🆔 รหัสนักศึกษา</span><span class="value">664245024</span></div>
             <div class="info-row"><span class="label">📚 หมู่เรียน</span><span class="value">66/43</span></div>
             <div class="info-row"><span class="label">🎓 สาขา</span><span class="value">วิทยาการคอมพิวเตอร์</span></div>
-            <div class="info-row"><span class="label">🏫 อาจารย์ผู้สอน</span><span class="value">……………</span></div>
+            <div class="info-row"><span class="label">‍🏫 อาจารย์ผู้สอน</span><span class="value">……………</span></div>
             """, unsafe_allow_html=True)
 
     st.markdown("")
