@@ -122,19 +122,6 @@ div.stButton > button {
 }
 div.stButton > button:hover { background: #52FF33; box-shadow: 0 0 22px rgba(57,255,20,.55); }
 
-/* ✅ ปุ่มเมนูด้านบน */
-.top-menu-btn button {
-    background: linear-gradient(135deg, #39FF14, #6A3AB2) !important;
-    color: #0A0A0A !important;
-    font-weight: 700 !important;
-    font-size: 0.95rem !important;
-    font-family: 'Orbitron', 'IBM Plex Sans Thai', sans-serif !important;
-}
-.top-menu-btn button:hover {
-    filter: brightness(1.1);
-    box-shadow: 0 0 20px rgba(57, 255, 20, 0.5) !important;
-}
-
 input, textarea {
     background: #212B3B !important; border: 1px solid #3A465C !important;
     color: #F2F5FB !important; border-radius: 8px !important;
@@ -251,48 +238,28 @@ def train_now(key):
             st.session_state["eval"] = build_and_eval()
         st.rerun()
 
-# ✅ Callback functions สำหรับปุ่มเมนูบน
+# ==================== ✅ ระบบนำทาง (state เดียว ใช้ callback) ====================
+NAV_OPTIONS = ["🏠 หน้าหลัก", "👤 ผู้พัฒนา"]
+
 def go_home():
-    st.session_state["current_page"] = "🏠 หน้าหลัก"
+    st.session_state["nav_widget"] = NAV_OPTIONS[0]
 
 def go_dev():
-    st.session_state["current_page"] = "👤 ผู้พัฒนา"
+    st.session_state["nav_widget"] = NAV_OPTIONS[1]
 
-# ==================== ✅ ตั้งค่า state เริ่มต้น (ครั้งเดียว) ====================
-if "current_page" not in st.session_state:
-    st.session_state["current_page"] = "🏠 หน้าหลัก"
-
-# ==================== แถบเมนู: Sidebar + แถบบน ====================
 st.sidebar.markdown('<div class="hub-title">MACHINE LEARNING HUB</div>', unsafe_allow_html=True)
 st.sidebar.markdown('<hr class="hub-hr">', unsafe_allow_html=True)
 st.sidebar.markdown("### 📍 นำทาง")
+page = st.sidebar.selectbox("เลือกหน้า", NAV_OPTIONS, key="nav_widget")
 
-# ✅ ใช้ state ตัวกลาง "current_page" เป็น default ของ selectbox
-# แล้วเมื่อกด selectbox ก็อัปเดต current_page กลับ
-page = st.sidebar.selectbox(
-    "เลือกหน้า",
-    ["🏠 หน้าหลัก", "👤 ผู้พัฒนา"],
-    index=["🏠 หน้าหลัก", "👤 ผู้พัฒนา"].index(st.session_state["current_page"]),
-    key="sidebar_nav_widget"
-)
-# อัปเดต state เมื่อ selectbox เปลี่ยน
-st.session_state["current_page"] = page
-
-# แถบเมนูด้านบน (ใช้ callback ไม่แก้ widget key โดยตรง)
-tb1, tb2, tb3 = st.columns([1.2, 1.2, 6])
+# ปุ่มลัดด้านบน (callback จะเปลี่ยนค่า selectbox ให้เอง)
+tb1, tb2, _ = st.columns([1.2, 1.2, 6])
 with tb1:
-    with st.container():
-        st.markdown('<div class="top-menu-btn">', unsafe_allow_html=True)
-        st.button("🏠 หน้าหลัก", use_container_width=True, key="top_home_btn", on_click=go_home)
-        st.markdown('</div>', unsafe_allow_html=True)
+    st.button("🏠 หน้าหลัก", use_container_width=True, key="top_home_btn", on_click=go_home)
 with tb2:
-    with st.container():
-        st.markdown('<div class="top-menu-btn">', unsafe_allow_html=True)
-        st.button("👤 ผู้พัฒนา", use_container_width=True, key="top_dev_btn", on_click=go_dev)
-        st.markdown('</div>', unsafe_allow_html=True)
+    st.button("👤 ผู้พัฒนา", use_container_width=True, key="top_dev_btn", on_click=go_dev)
 
 EV = st.session_state.get("eval", None)
-page = st.session_state["current_page"]  # ใช้ค่าจริงจาก state
 
 # ================================================================
 #              หน้าหลัก
