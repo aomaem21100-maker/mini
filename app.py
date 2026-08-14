@@ -17,7 +17,9 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from imblearn.over_sampling import SMOTE
 
-st.set_page_config(page_title="Machine Learning Hub", page_icon="🤖", layout="wide")
+# ✅ บังคับ Sidebar กางเสมอตอนเปิดเว็บ
+st.set_page_config(page_title="Machine Learning Hub", page_icon="🤖",
+                   layout="wide", initial_sidebar_state="expanded")
 
 plt.rcParams.update({
     "figure.facecolor": "#212B3B", "axes.facecolor": "#212B3B",
@@ -41,7 +43,7 @@ div[data-testid="stAppViewContainer"] > section.main {
 }
 #MainMenu, header, footer { visibility: hidden; }
 
-/* ===== Sidebar (แถบซ้ายมือ) #D4D2F2 + ชื่อ gradient ดำ ===== */
+/* ===== Sidebar (แถบซ้ายมือ) ===== */
 section[data-testid="stSidebar"] { background: #D4D2F2; border-right: 2px solid #6A3AB2; }
 section[data-testid="stSidebar"] p,
 section[data-testid="stSidebar"] span,
@@ -57,7 +59,6 @@ section[data-testid="stSidebar"] label { color: #1A1A2E; }
     border: none; height: 3px; margin: .9rem 0 1.2rem 0;
     background: repeating-linear-gradient(45deg, #FF7A00 0 10px, #14141E 10px 20px);
 }
-/* เมนูซ้ายมือแบบแท็บ */
 section[data-testid="stSidebar"] div[role="radiogroup"] input[type="radio"] { display: none; }
 section[data-testid="stSidebar"] div[role="radiogroup"] label {
     display: block; padding: .8rem 1rem; border-radius: 8px;
@@ -237,15 +238,26 @@ def train_now(key):
             st.session_state["eval"] = build_and_eval()
         st.rerun()
 
-# ==================== ✅ แถบนำทางซ้ายมือ (แยก 2 หน้าชัดเจน) ====================
+# ==================== ✅ แถบเมนู 2 ชั้น (Sidebar + แถบบนถาวร) ====================
 st.sidebar.markdown('<div class="hub-title">MACHINE LEARNING HUB</div>', unsafe_allow_html=True)
 st.sidebar.markdown('<hr class="hub-hr">', unsafe_allow_html=True)
-page = st.sidebar.radio("นำทาง", ["🏠 หน้าหลัก", "👤 ผู้พัฒนา"], label_visibility="collapsed")
+st.session_state.setdefault("nav", "🏠 หน้าหลัก")
+page = st.sidebar.radio("นำทาง", ["🏠 หน้าหลัก", "👤 ผู้พัฒนา"],
+                        label_visibility="collapsed", key="nav")
+
+# ✅ แถบเมนูด้านบน — เห็นเสมอแม้ Sidebar ถูกพับ
+tb1, tb2, _ = st.columns([1.2, 1.2, 6])
+with tb1:
+    if st.button("🏠 หน้าหลัก", use_container_width=True, key="tb_home"):
+        st.session_state["nav"] = "🏠 หน้าหลัก"; st.rerun()
+with tb2:
+    if st.button("👤 ผู้พัฒนา", use_container_width=True, key="tb_dev"):
+        st.session_state["nav"] = "👤 ผู้พัฒนา"; st.rerun()
 
 EV = st.session_state.get("eval", None)
 
 # ================================================================
-#              หน้าหลัก — เนื้อหาโปรเจกต์ล้วน (ไม่มีการ์ดผู้พัฒนา)
+#              หน้าหลัก — เนื้อหาโปรเจกต์ล้วน
 # ================================================================
 if page == "🏠 หน้าหลัก":
     st.markdown('<span class="tag-cyber">MACHINE LEARNING PROJECT</span>', unsafe_allow_html=True)
