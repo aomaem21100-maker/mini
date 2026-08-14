@@ -444,48 +444,68 @@ else:
     </style>
     """, unsafe_allow_html=True)
 
-    st.markdown("""
-    <div class="dev-head">
-        <div class="dev-title">ผู้พัฒนา</div>
-        <div class="dev-sub">ข้อมูลผู้จัดทำโปรเจค Machine Learning Hub</div>
-    </div>
+        st.markdown("""
+    <style>
+    div[data-testid="stVerticalBlockBorderWrapper"] { max-width: 680px; margin: 0 auto; }
+    
+    /* ✅ รูปโปรไฟล์สมส่วน ไม่ตัดหัว */
+    div[data-testid="stAppViewContainer"] section.main img {
+        display: block; 
+        margin: 0 auto;
+        width: 240px; 
+        height: 240px; 
+        object-fit: cover;
+        object-position: center top;  /* ✅ ดันรูปขึ้นบน ให้เห็นหน้าชัด */
+        border-radius: 50%;
+        border: 5px solid transparent;
+        background: 
+            linear-gradient(#212B3B, #212B3B) padding-box,
+            linear-gradient(135deg, #39FF14, #6A3AB2) border-box;
+        box-shadow: 0 0 40px rgba(57, 255, 20, .4);
+        transition: all 0.3s ease;
+    }
+    div[data-testid="stAppViewContainer"] section.main img:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 50px rgba(57, 255, 20, .6);
+    }
+    
+    .dev-head { text-align: center; margin-top: 1.5rem; }
+    .dev-title {
+        font-size: 2.6rem; font-weight: 800;
+        background: linear-gradient(90deg, #39FF14 0%, #7EF29A 35%, #6A3AB2 75%, #FF7A00 100%);
+        -webkit-background-clip: text; background-clip: text; color: transparent;
+        text-shadow: 0 0 24px rgba(57, 255, 20, .25);
+    }
+    .dev-sub { color: #93A1B8; letter-spacing: 1px; font-size: .95rem; margin-top: .3rem; }
+    
+    /* ✅ Avatar placeholder ขนาดเท่ารูปจริง */
+    .dev-avatar {
+        width: 240px; height: 240px; border-radius: 50%; margin: 0 auto;
+        background: linear-gradient(135deg, rgba(57,255,20,.25), rgba(106,58,178,.4));
+        border: 5px solid #6A3AB2;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 5rem; 
+        box-shadow: 0 0 40px rgba(57,255,20,.4);
+    }
+    
+    .dev-name { text-align: center; font-size: 1.35rem; font-weight: 700; color: #F2F5FB; margin: .3rem 0 1rem 0; }
+    .info-row {
+        display: flex; justify-content: space-between; gap: 1rem;
+        padding: .8rem .2rem; border-top: 1px solid #3A465C; font-size: .95rem;
+    }
+    .info-row:first-child { border-top: none; }
+    .info-row .label { color: #93A1B8; }
+    .info-row .value { color: #F2F5FB; font-weight: 600; }
+    .dev-center { text-align: center; }
+    .dev2-chip {
+        display: inline-block; margin: .2rem .3rem; padding: .4rem .9rem;
+        border-radius: 999px; border: 1px solid rgba(57,255,20,.55);
+        color: #39FF14; font-size: .82rem; font-weight: 600; background: rgba(57,255,20,.06);
+    }
+    .dev2-chip.purple { border-color: rgba(106,58,178,.6); color: #B794F6; background: rgba(106,58,178,.1); }
+    .dev2-chip.orange { border-color: rgba(255,122,0,.55); color: #FF7A00; background: rgba(255,122,0,.07); }
+    </style>
     """, unsafe_allow_html=True)
-
-    if PHOTO:
-        st.image(PHOTO)
-    else:
-        st.markdown('<div class="dev-avatar">👤</div>', unsafe_allow_html=True)
-
-    st.markdown("")
-
-    with st.container(border=True):
-        st.markdown('<div class="dev-name">นาย จตุรภัทร สถาปีตานนท์</div>', unsafe_allow_html=True)
-        st.markdown("""
-        <div class="info-row"><span class="label">รหัสนักศึกษา</span><span class="value">664245024</span></div>
-        <div class="info-row"><span class="label">หมู่เรียน</span><span class="value">Sec. 66/43</span></div>
-        <div class="info-row"><span class="label">สาขา</span><span class="value">วิทยาการคอมพิวเตอร์</span></div>
-        <div class="info-row"><span class="label">อาจารย์ผู้สอน</span><span class="value">……………</span></div>
-        """, unsafe_allow_html=True)
-
-    st.markdown("")
-
-    with st.container(border=True):
-        st.markdown('<div class="dev-center"><h3 style="margin:.2rem 0 .5rem 0;">📝 เกี่ยวกับโปรเจกต์</h3></div>', unsafe_allow_html=True)
-        st.write("💡 โครงงานนี้เป็นส่วนหนึ่งของวิชา Machine Learning โดยมีวัตถุประสงค์เพื่อศึกษาและประยุกต์ใช้"
-                 "เทคนิคการเรียนรู้ของเครื่องในการตรวจจับธุรกรรมบัตรเครดิตที่น่าสงสัย")
-
-        st.markdown('<div class="dev-center"><h3 style="margin:1rem 0 .5rem 0;">🛠️ เทคโนโลยีที่ใช้</h3></div>', unsafe_allow_html=True)
-        st.markdown("""
-        <div class="dev-center">
-            <span class="dev2-chip">🐍 Python</span>
-            <span class="dev2-chip">🤖 scikit-learn</span>
-            <span class="dev2-chip">🚀 Streamlit</span>
-            <span class="dev2-chip purple">⚖️ imbalanced-learn</span>
-            <span class="dev2-chip purple">📊 matplotlib</span>
-            <span class="dev2-chip orange">🐼 pandas</span>
-        </div>
-        """, unsafe_allow_html=True)
-
         st.markdown('<div class="dev-center"><h3 style="margin:1rem 0 .5rem 0;">🔗 ลิงก์ที่เกี่ยวข้อง</h3></div>', unsafe_allow_html=True)
         st.markdown("- 🌐 [GitHub Profile](https://github.com/aomaem21100-maker?tab=repositories)\n"
                     "- 📦 [Source Code โปรเจกต์นี้](https://github.com/aomaem21100-maker)\n"
