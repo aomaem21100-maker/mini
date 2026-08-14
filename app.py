@@ -3,6 +3,10 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
@@ -10,24 +14,22 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 
 st.set_page_config(page_title="Machine Learning Hub", page_icon="🤖", layout="wide")
-st.session_state.setdefault("models", None)
-st.session_state.setdefault("scaler", None)
+
+# ===== กราฟโทน Eva (มืด+neon) =====
+plt.rcParams.update({
+    "figure.facecolor": "#212B3B", "axes.facecolor": "#212B3B",
+    "axes.edgecolor": "#3A465C", "axes.labelcolor": "#D5DCEA",
+    "text.color": "#D5DCEA", "xtick.color": "#93A1B8", "ytick.color": "#93A1B8",
+    "legend.facecolor": "#212B3B", "grid.color": "#3A465C",
+    "font.size": 10,
+})
+EVA_COLORS = ["#39FF14", "#6A3AB2", "#FF7A00", "#4CC9F0"]
 
 # ==================== EVANGELION THEME ====================
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Orbitron:wght@500;700;900&family=Inter:wght@400;600;700&display=swap');
 
-/* ===== Palette: EVA Unit-01 / NERV =====
-   sidebar   : #D4D2F2
-   bg main   : #293242
-   purple    : #6A3AB2 (Unit-01)
-   neon green: #39FF14 (terminal)
-   orange    : #FF7A00 (NERV/hazard)
-   red       : #FF2A2A (emergency)
-====================================== */
-
-/* ===== พื้นหลังหลัก #293242 + กริดเรืองแสง ===== */
 div[data-testid="stAppViewContainer"] > section.main {
     background-color: #293242;
     background-image:
@@ -37,11 +39,7 @@ div[data-testid="stAppViewContainer"] > section.main {
 }
 #MainMenu, header, footer { visibility: hidden; }
 
-/* ===== Sidebar #D4D2F2 ===== */
-section[data-testid="stSidebar"] {
-    background: #D4D2F2;
-    border-right: 2px solid #6A3AB2;
-}
+section[data-testid="stSidebar"] { background: #D4D2F2; border-right: 2px solid #6A3AB2; }
 section[data-testid="stSidebar"] p,
 section[data-testid="stSidebar"] span,
 section[data-testid="stSidebar"] label { color: #1A1A2E; }
@@ -57,31 +55,26 @@ section[data-testid="stSidebar"] label { color: #1A1A2E; }
     background: repeating-linear-gradient(45deg, #FF7A00 0 10px, #14141E 10px 20px);
 }
 
-/* ===== เมนูนำทาง ===== */
 section[data-testid="stSidebar"] div[role="radiogroup"] input[type="radio"] { display: none; }
 section[data-testid="stSidebar"] div[role="radiogroup"] label {
     display: block; padding: .75rem 1rem; border-radius: 8px;
     color: #3A3A55; font-weight: 600; cursor: pointer;
-    border-left: 3px solid transparent; margin-bottom: .35rem;
-    transition: all .2s ease;
+    border-left: 3px solid transparent; margin-bottom: .35rem; transition: all .2s ease;
 }
-section[data-testid="stSidebar"] div[role="radiogroup"] label:hover { color: #000000; background: rgba(106,58,178,.12); }
+section[data-testid="stSidebar"] div[role="radiogroup"] label:hover { color: #000; background: rgba(106,58,178,.12); }
 section[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) {
     background: linear-gradient(90deg, #14141E, #2A2A3A);
-    border-left: 3px solid #39FF14;
-    color: #39FF14;
+    border-left: 3px solid #39FF14; color: #39FF14;
     font-family: 'Orbitron', 'IBM Plex Sans Thai', sans-serif;
-    letter-spacing: .5px;
 }
 
-/* ===== ข้อความหลัก ===== */
 html, body, [class*="css"] { font-family: 'IBM Plex Sans Thai', 'Inter', sans-serif; }
 h1,h2,h3,h4 { color: #F2F5FB; font-weight: 600; }
 p, li { color: #D5DCEA; }
 caption, small { color: #93A1B8 !important; }
 
 .grad-title {
-    font-size: 2.3rem; font-weight: 800;
+    font-size: 2.2rem; font-weight: 800;
     background: linear-gradient(90deg, #39FF14 0%, #7EF29A 35%, #6A3AB2 80%, #FF7A00 100%);
     -webkit-background-clip: text; background-clip: text; color: transparent;
     text-shadow: 0 0 24px rgba(57,255,20,.25);
@@ -90,68 +83,51 @@ caption, small { color: #93A1B8 !important; }
     display: inline-block; font-family: 'Orbitron', sans-serif;
     font-size: .68rem; letter-spacing: 2.5px; color: #39FF14;
     border: 1px solid rgba(57,255,20,.6); border-radius: 4px;
-    padding: .25rem .7rem; margin-bottom: .6rem;
-    background: rgba(57,255,20,.08);
+    padding: .25rem .7rem; margin-bottom: .6rem; background: rgba(57,255,20,.08);
 }
 
-/* ===== การ์ด ===== */
 div[data-testid="stVerticalBlockBorderWrapper"] {
     background: #212B3B; border: 1px solid #3A465C; border-radius: 14px;
     box-shadow: 0 2px 14px rgba(0,0,0,.35);
 }
-
-/* ===== Metrics ===== */
 div[data-testid="stMetric"] {
     background: #212B3B; border: 1px solid #3A465C;
     border-left: 4px solid #FF7A00; border-radius: 10px; padding: 1rem 1.2rem;
 }
-div[data-testid="stMetric"] label { color: #93A1B8 !important; font-size: .78rem; font-weight: 600; letter-spacing: .5px; }
-div[data-testid="stMetric"] div[data-testid="stMetricValue"] { color: #39FF14; font-weight: 700; text-shadow: 0 0 12px rgba(57,255,20,.35); }
+div[data-testid="stMetric"] label { color: #93A1B8 !important; font-size: .78rem; font-weight: 600; }
+div[data-testid="stMetric"] div[data-testid="stMetricValue"] {
+    color: #39FF14; font-weight: 700; text-shadow: 0 0 12px rgba(57,255,20,.35);
+}
 
-/* ===== Tabs ===== */
 div[data-testid="stTabs"] ul { gap: 0; border-bottom: 1px solid #3A465C; background: transparent; }
 div[data-testid="stTabs"] button {
-    background: transparent; color: #93A1B8; border-radius: 0;
-    font-weight: 500; padding: .7rem 1.3rem; border: none;
-    border-bottom: 3px solid transparent;
+    background: transparent; color: #93A1B8; border-radius: 0; font-weight: 500;
+    padding: .7rem 1.3rem; border: none; border-bottom: 3px solid transparent;
 }
 div[data-testid="stTabs"] button[aria-selected="true"] {
-    color: #39FF14; border-bottom: 3px solid #39FF14;
-    font-weight: 700; background: transparent; box-shadow: none;
-    text-shadow: 0 0 10px rgba(57,255,20,.4);
+    color: #39FF14; border-bottom: 3px solid #39FF14; font-weight: 700;
+    background: transparent; box-shadow: none; text-shadow: 0 0 10px rgba(57,255,20,.4);
 }
 div[data-testid="stTabs"] button:hover { color: #39FF14; background: transparent; }
 
-/* ===== ปุ่ม neon green (EVA terminal) ===== */
 div.stButton > button {
     background: #39FF14; color: #0A0A0A; border: none; border-radius: 8px;
     font-weight: 700; padding: .55rem 1.8rem;
     font-family: 'Orbitron', 'IBM Plex Sans Thai', sans-serif;
-    letter-spacing: .5px;
-    box-shadow: 0 0 14px rgba(57,255,20,.35), inset 0 0 0 1px rgba(0,0,0,.25);
-    transition: all .2s ease;
+    box-shadow: 0 0 14px rgba(57,255,20,.35); transition: all .2s ease;
 }
-div.stButton > button:hover {
-    background: #52FF33; transform: translateY(-1px);
-    box-shadow: 0 0 22px rgba(57,255,20,.55);
-}
+div.stButton > button:hover { background: #52FF33; box-shadow: 0 0 22px rgba(57,255,20,.55); }
 
-/* ===== Inputs ===== */
 input, textarea {
     background: #212B3B !important; border: 1px solid #3A465C !important;
     color: #F2F5FB !important; border-radius: 8px !important;
 }
-input:focus, textarea:focus {
-    border-color: #39FF14 !important;
-    box-shadow: 0 0 0 3px rgba(57,255,20,.15) !important;
-}
+input:focus, textarea:focus { border-color: #39FF14 !important; box-shadow: 0 0 0 3px rgba(57,255,20,.15) !important; }
 div[data-baseweb="select"] > div { background: #212B3B !important; border: 1px solid #3A465C !important; color: #F2F5FB !important; }
 
-/* ===== Progress / Alert / Expander ===== */
 div[data-testid="stProgress"] > div { background: #1A2230; border-radius: 4px; }
 div[data-testid="stProgress"] > div > div {
-    background: linear-gradient(90deg, #39FF14, #6A3AB2);
-    border-radius: 4px;
+    background: linear-gradient(90deg, #39FF14, #6A3AB2); border-radius: 4px;
     box-shadow: 0 0 12px rgba(57,255,20,.4);
 }
 div[data-testid="stAlert"] { background: #212B3B; border: 1px solid #3A465C; border-radius: 10px; color: #D5DCEA; }
@@ -160,29 +136,24 @@ div[data-testid="stExpander"] { background: #212B3B; border: 1px solid #3A465C; 
 hr { border-color: #3A465C !important; }
 img { border-radius: 10px; border: 1px solid #3A465C; }
 
-/* ===== Hazard line (NERV) ===== */
 .hazard-line {
     height: 4px; border-radius: 2px; margin: .5rem 0 1rem 0;
     background: repeating-linear-gradient(45deg, #FF7A00 0 12px, #14141E 12px 24px);
 }
 
-/* ===== Developer Page ===== */
 .info-row { display: flex; gap: .6rem; padding: .4rem 0; font-size: .95rem; }
 .info-row .label { color: #93A1B8; min-width: 140px; }
 .info-row .value { color: #F2F5FB; font-weight: 600; }
 .tech-chip {
     display: inline-block; margin: .2rem .35rem .2rem 0; padding: .4rem .9rem;
     border-radius: 999px; border: 1px solid rgba(57,255,20,.6);
-    color: #39FF14; font-size: .82rem; font-weight: 600;
-    background: rgba(57,255,20,.06);
+    color: #39FF14; font-size: .82rem; font-weight: 600; background: rgba(57,255,20,.06);
 }
 .avatar-box {
-    width: 110px; height: 110px; border-radius: 50%;
+    width: 100%; aspect-ratio: 1; border-radius: 14px;
     background: linear-gradient(135deg, rgba(106,58,178,.4), rgba(57,255,20,.25));
-    border: 2px solid #6A3AB2;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 3rem;
-    box-shadow: 0 0 18px rgba(106,58,178,.5);
+    border: 2px solid #6A3AB2; display: flex; align-items: center; justify-content: center;
+    font-size: 2.6rem; box-shadow: 0 0 18px rgba(106,58,178,.5);
 }
 </style>
 """, unsafe_allow_html=True)
@@ -214,23 +185,21 @@ def make_data(n=20000, seed=42):
     data["Class"] = np.random.choice([0, 1], n, p=[0.9983, 0.0017])
     return pd.DataFrame(data)
 
+# ==================== ✨ ฝึก + ประเมินผลในตัว (ครบข้อ 4) ====================
 @st.cache_resource
-def build_models():
-    from imblearn.over_sampling import SMOTE
+def build_and_eval():
     from sklearn.model_selection import train_test_split
+    from sklearn.metrics import (accuracy_score, precision_score, recall_score,
+                                 f1_score, roc_curve, confusion_matrix)
+    from imblearn.over_sampling import SMOTE
 
     df = make_data(20000)
-    X = df.drop(columns=["Class"])
-    y = df["Class"]
-
-    cols_to_scale = ["Amount", "Time"]
+    X = df.drop(columns=["Class"]); y = df["Class"]
     scaler = StandardScaler()
-    X[cols_to_scale] = scaler.fit_transform(X[cols_to_scale])
-
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
-
-    smote = SMOTE(random_state=42)
-    X_train_res, y_train_res = smote.fit_resample(X_train, y_train)
+    X[["Amount", "Time"]] = scaler.fit_transform(X[["Amount", "Time"]])
+    X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=.2, stratify=y, random_state=42)
+    sm = SMOTE(random_state=42)
+    X_tr_res, y_tr_res = sm.fit_resample(X_tr, y_tr)
 
     models = {
         "Logistic Regression": LogisticRegression(max_iter=1000, class_weight="balanced"),
@@ -238,38 +207,91 @@ def build_models():
         "Random Forest": RandomForestClassifier(n_estimators=100, random_state=42, class_weight="balanced"),
         "K-NN": KNeighborsClassifier(n_neighbors=5),
     }
-    trained = {}
+    rows, trained, preds, probas = {}, {}, {}, {}
     for name, m in models.items():
-        if name == "K-NN":
-            m.fit(X_train, y_train)
-        else:
-            m.fit(X_train_res, y_train_res)
-        trained[name] = m
-    return trained, scaler
+        if name == "K-NN": m.fit(X_tr, y_tr)
+        else: m.fit(X_tr_res, y_tr_res)
+        yp = m.predict(X_te); pr = m.predict_proba(X_te)[:, 1]
+        trained[name] = m; preds[name] = yp; probas[name] = pr
+        rows[name] = [accuracy_score(y_te, yp), precision_score(y_te, yp, zero_division=0),
+                      recall_score(y_te, yp, zero_division=0), f1_score(y_te, yp, zero_division=0)]
+    comp = pd.DataFrame(rows, index=["Accuracy", "Precision", "Recall", "F1"]).T.reset_index()
+    comp.columns = ["Model", "Accuracy", "Precision", "Recall", "F1"]
+    best_name = comp.sort_values("F1", ascending=False).iloc[0]["Model"]
+    return trained, scaler, comp, best_name, np.array(y_te), preds, probas
 
-comp = pd.read_csv("model_comparison.csv") if os.path.exists("model_comparison.csv") else None
-best = comp.sort_values("F1", ascending=False).iloc[0] if comp is not None else None
+def make_figures(comp, y_te, preds, probas, best_name):
+    # 1) กราฟแท่งเปรียบเทียบ
+    fig_bar, ax = plt.subplots(figsize=(9, 4.5))
+    x = np.arange(len(comp)); w = .2
+    for i, col in enumerate(["Accuracy", "Precision", "Recall", "F1"]):
+        ax.bar(x + i*w - 1.5*w, comp[col], w, label=col, color=EVA_COLORS[i])
+    ax.set_xticks(x); ax.set_xticklabels(comp["Model"], rotation=8)
+    ax.set_ylim(0, 1); ax.legend(); ax.set_title("Model Comparison"); ax.grid(axis="y", alpha=.3)
 
-# ==================== SIDEBAR NAV ====================
+    # 2) ROC Curve
+    fig_roc, ax = plt.subplots(figsize=(7, 5))
+    for i, (name, pr) in enumerate(probas.items()):
+        fpr, tpr, _ = roc_curve(y_te, pr)
+        ax.plot(fpr, tpr, color=EVA_COLORS[i], label=name)
+    ax.plot([0, 1], [0, 1], "--", color="#93A1B8", alpha=.6)
+    ax.set_title("ROC Curve"); ax.set_xlabel("FPR"); ax.set_ylabel("TPR")
+    ax.legend(loc="lower right")
+
+    # 3) Confusion Matrix โมเดลที่ดีที่สุด
+    cm = confusion_matrix(y_te, preds[best_name])
+    fig_cm, ax = plt.subplots(figsize=(5.5, 4.5))
+    im = ax.imshow(cm, cmap="Greens")
+    ax.set_xticks([0, 1]); ax.set_yticks([0, 1])
+    ax.set_xticklabels(["Normal", "Fraud"]); ax.set_yticklabels(["Normal", "Fraud"])
+    for ii in range(2):
+        for jj in range(2):
+            ax.text(jj, ii, f"{cm[ii, jj]:,}", ha="center", va="center",
+                    color="#0A0A0A" if cm[ii, jj] > cm.max()/2 else "#D5DCEA", fontweight="bold")
+    ax.set_title(f"Confusion Matrix - {best_name}")
+    fig_cm.colorbar(im, ax=ax, fraction=.046)
+    return fig_bar, fig_roc, fig_cm
+
+def train_now(key):
+    if st.button("🚀 เริ่มต้นฝึกโมเดลและประเมินผล", use_container_width=True, key=key):
+        with st.spinner("⚙️ กำลังฝึก 4 โมเดล + สร้างกราฟประเมินผล..."):
+            st.session_state["eval"] = build_and_eval()
+        st.rerun()
+
+# ==================== SIDEBAR ====================
 st.sidebar.markdown('<div class="hub-title">MACHINE LEARNING HUB</div>', unsafe_allow_html=True)
 st.sidebar.markdown('<hr class="hub-hr">', unsafe_allow_html=True)
 page = st.sidebar.radio("นำทาง", ["หน้าหลัก", "ผู้พัฒนา"], label_visibility="collapsed")
+
+EV = st.session_state.get("eval", None)
 
 # ================================================================
 #                         หน้าหลัก
 # ================================================================
 if page == "หน้าหลัก":
     st.markdown('<span class="tag-cyber">MACHINE LEARNING PROJECT</span>', unsafe_allow_html=True)
-    st.markdown('<div class="grad-title">ระบบตรวจจับธุรกรรมที่น่าสงสัย</div>', unsafe_allow_html=True)
-    st.markdown('<div class="hazard-line"></div>', unsafe_allow_html=True)
-    st.caption("🔍 การจำแนกธุรกรรมปกติและธุรกรรมทุจริตด้วยเทคนิคการเรียนรู้ของเครื่อง")
 
-    st.markdown("")
+    hd1, hd2 = st.columns([3, 1], gap="large")
+    with hd1:
+        st.markdown('<div class="grad-title">ระบบตรวจจับธุรกรรมที่น่าสงสัย</div>', unsafe_allow_html=True)
+        st.markdown('<div class="hazard-line"></div>', unsafe_allow_html=True)
+        st.caption("🔍 การจำแนกธุรกรรมปกติและธุรกรรมทุจริตด้วยเทคนิคการเรียนรู้ของเครื่อง")
+    with hd2:  # ✅ ข้อมูลผู้พัฒนาปรากฏบนหน้าหลัก (ตามโจทย์)
+        with st.container(border=True):
+            pc1, pc2 = st.columns([1, 2], gap="small")
+            with pc1:
+                if PHOTO: st.image(PHOTO, use_container_width=True)
+                else: st.markdown('<div class="avatar-box">👤</div>', unsafe_allow_html=True)
+            with pc2:
+                st.markdown("**นาย จตุรภัทร สถาปีตานนท์**")
+                st.caption("🆔 664245024")
+                st.caption("📚 หมู่เรียน 66/43")
+
     m1, m2, m3, m4 = st.columns(4)
     m1.metric("📊 ขนาดข้อมูล", "20,000 รายการ")
     m2.metric("🔢 คุณลักษณะ", "30 ตัว")
-    m3.metric("🏆 โมเดลที่ดีที่สุด", best["Model"] if best is not None else "–")
-    m4.metric("📈 F1-Score", f"{best['F1']:.2%}" if best is not None else "–")
+    m3.metric("🏆 โมเดลที่ดีที่สุด", EV[3] if EV else "–")
+    m4.metric("📈 F1-Score", f"{EV[2].sort_values('F1', ascending=False).iloc[0]['F1']:.2%}" if EV else "–")
 
     st.markdown("")
 
@@ -322,46 +344,40 @@ if page == "หน้าหลัก":
                 st.markdown("**👥 K-Nearest Neighbors (K-NN)**")
                 st.caption("📏 จำแนกจาก k เพื่อนบ้านที่ใกล้ที่สุด ต้อง scaling ก่อน")
 
-    with t4:
-        if comp is not None:
+    with t4:  # ✅ ตาราง + กราฟ สร้างสดในเว็บ
+        if EV is None:
+            with st.container(border=True):
+                st.info("⏳ ยังไม่มีผลการประเมิน — กดปุ่มเพื่อฝึกโมเดลและสร้างตาราง+กราฟอัตโนมัติ")
+                train_now("btn_train4")
+        else:
+            trained, scaler, comp, best_name, y_te, preds, probas = EV
             with st.container(border=True):
                 st.subheader("📊 4.1 ตารางเปรียบเทียบประสิทธิภาพ")
-                st.dataframe(comp, use_container_width=True, hide_index=True)
-        i1, i2 = st.columns(2)
-        if os.path.exists("compare.png"):
-            with i1:
+                st.dataframe(comp.round(4), use_container_width=True, hide_index=True)
+                st.caption(f"🏆 โมเดลที่ดีที่สุดตาม F1-Score: **{best_name}**")
+            fig_bar, fig_roc, fig_cm = make_figures(comp, y_te, preds, probas, best_name)
+            st.subheader("📈 4.2 กราฟเปรียบเทียบโมเดล")
+            st.pyplot(fig_bar)
+            g1, g2 = st.columns(2)
+            with g1:
                 with st.container(border=True):
-                    st.image("compare.png", caption="📈 กราฟเปรียบเทียบประสิทธิภาพโมเดล", use_container_width=True)
-        if os.path.exists("cm.png"):
-            with i2:
+                    st.pyplot(fig_roc)
+                    st.caption("📉 ภาพที่ 2: เส้นโค้ง ROC ของทั้ง 4 โมเดล")
+            with g2:
                 with st.container(border=True):
-                    st.image("cm.png", caption="🎯 Confusion Matrix ของโมเดลที่ดีที่สุด", use_container_width=True)
-        if os.path.exists("roc.png"):
-            with st.container(border=True):
-                st.image("roc.png", caption="📉 เส้นโค้ง ROC", use_container_width=True)
-        if os.path.exists("pr_curve.png"):
-            with st.container(border=True):
-                st.image("pr_curve.png", caption="📊 เส้นโค้ง Precision-Recall", use_container_width=True)
+                    st.pyplot(fig_cm)
+                    st.caption(f"🎯 ภาพที่ 3: Confusion Matrix ของ {best_name}")
 
     with t5:
         with st.container(border=True):
             st.subheader("🔮 5.1 ทดลองตรวจจับธุรกรรม")
-
-            if st.session_state.models is None:
+            if EV is None:
                 st.info("⏳ โมเดลยังไม่ถูกฝึก — กดปุ่มด้านล่างเพื่อเริ่มต้น")
-                if st.button("🚀 เริ่มต้นฝึกโมเดล", use_container_width=True):
-                    try:
-                        with st.spinner("⚙️ กำลังสร้างข้อมูลและฝึกโมเดล..."):
-                            models, scaler = build_models()
-                            st.session_state.models = models
-                            st.session_state.scaler = scaler
-                        st.rerun()
-                    except Exception as e:
-                        st.error(f"❌ ไม่สามารถฝึกโมเดลได้: {e}")
+                train_now("btn_train5")
             else:
-                models = st.session_state.models
-                scaler = st.session_state.scaler
-                model_name = st.selectbox("🎛️ เลือกโมเดล", list(models.keys()), index=2)
+                trained, scaler, comp, best_name, y_te, preds, probas = EV
+                best_idx = list(trained.keys()).index(best_name)
+                model_name = st.selectbox("🎛️ เลือกโมเดล", list(trained.keys()), index=best_idx)
 
                 st.markdown("**📝 กรอกข้อมูลธุรกรรม**")
                 c1, c2 = st.columns(2)
@@ -374,31 +390,23 @@ if page == "หน้าหลัก":
 
                 if st.button("🔍 ตรวจจับธุรกรรม", use_container_width=True):
                     inp_dict = {f"V{i}": 0.0 for i in range(1, 29)}
-                    inp_dict["V1"] = float(v1)
-                    inp_dict["V2"] = float(v2)
-
-                    scaled = scaler.transform(
-                        pd.DataFrame([[amount, time_val]], columns=["Amount", "Time"])
-                    )[0]
-                    inp_dict["Amount"] = float(scaled[0])
-                    inp_dict["Time"] = float(scaled[1])
-
+                    inp_dict["V1"] = float(v1); inp_dict["V2"] = float(v2)
+                    scaled = scaler.transform(pd.DataFrame([[amount, time_val]], columns=["Amount", "Time"]))[0]
+                    inp_dict["Amount"] = float(scaled[0]); inp_dict["Time"] = float(scaled[1])
                     train_columns = [f"V{i}" for i in range(1, 29)] + ["Time", "Amount"]
                     inp = pd.DataFrame([inp_dict])[train_columns]
 
-                    m = models[model_name]
+                    m = trained[model_name]
                     pred = m.predict(inp)[0]
                     proba = m.predict_proba(inp)[0][1]
 
                     st.markdown("---")
                     if pred == 1:
                         st.error(f"🚨 **ผลการตรวจจับ:** ธุรกรรมน่าสงสัย (Fraud)")
-                        st.write(f"🎯 ความน่าจะเป็น fraud: {proba:.1%}")
-                        st.progress(float(proba))
                     else:
                         st.success(f"✅ **ผลการตรวจจับ:** ธุรกรรมปกติ (Normal)")
-                        st.write(f"🎯 ความน่าจะเป็น fraud: {proba:.1%}")
-                        st.progress(float(proba))
+                    st.write(f"🎯 ความน่าจะเป็น fraud: **{proba:.1%}**")
+                    st.progress(float(proba))
 
     st.markdown("---")
     st.caption("📚 จัดทำเพื่อประกอบการเรียนวิชา Machine Learning • 🛠️ พัฒนาด้วย Python, scikit-learn, Streamlit")
@@ -414,16 +422,15 @@ else:
     with st.container(border=True):
         a1, a2 = st.columns([1, 2], gap="large")
         with a1:
-            if PHOTO:
-                st.image(PHOTO, use_container_width=True)
-            else:
-                st.markdown('<div class="avatar-box">👤</div>', unsafe_allow_html=True)
+            if PHOTO: st.image(PHOTO, use_container_width=True)
+            else: st.markdown('<div class="avatar-box">👤</div>', unsafe_allow_html=True)
         with a2:
             st.markdown("""
             <div class="info-row"><span class="label">👤 ชื่อ-นามสกุล</span><span class="value">นาย จตุรภัทร สถาปีตานนท์</span></div>
             <div class="info-row"><span class="label">🆔 รหัสนักศึกษา</span><span class="value">664245024</span></div>
             <div class="info-row"><span class="label">📚 หมู่เรียน</span><span class="value">66/43</span></div>
             <div class="info-row"><span class="label">🎓 สาขา</span><span class="value">วิทยาการคอมพิวเตอร์</span></div>
+            <div class="info-row"><span class="label">‍🏫 อาจารย์ผู้สอน</span><span class="value">……………</span></div>
             """, unsafe_allow_html=True)
 
     st.markdown("")
@@ -438,8 +445,8 @@ else:
         <span class="tech-chip">🤖 scikit-learn</span>
         <span class="tech-chip">🚀 Streamlit</span>
         <span class="tech-chip">⚖️ imbalanced-learn</span>
+        <span class="tech-chip">📊 matplotlib</span>
         <span class="tech-chip">🐼 pandas</span>
-        <span class="tech-chip">🔢 NumPy</span>
         """, unsafe_allow_html=True)
 
         st.subheader("🔗 ลิงก์ที่เกี่ยวข้อง")
