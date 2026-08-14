@@ -7,15 +7,20 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
+# ✅ Import ทั้งหมดไว้บนสุด (แก้ NameError)
 from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import (accuracy_score, precision_score, recall_score,
+                             f1_score, roc_curve, confusion_matrix)
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
+from imblearn.over_sampling import SMOTE
 
 st.set_page_config(page_title="Machine Learning Hub", page_icon="🤖", layout="wide")
 
-# ===== กราฟโทน Eva (มืด+neon) =====
+# ===== กราฟโทน Eva =====
 plt.rcParams.update({
     "figure.facecolor": "#212B3B", "axes.facecolor": "#212B3B",
     "axes.edgecolor": "#3A465C", "axes.labelcolor": "#D5DCEA",
@@ -185,14 +190,9 @@ def make_data(n=20000, seed=42):
     data["Class"] = np.random.choice([0, 1], n, p=[0.9983, 0.0017])
     return pd.DataFrame(data)
 
-# ==================== ✨ ฝึก + ประเมินผลในตัว (ครบข้อ 4) ====================
+# ==================== ฝึก + ประเมินผล (imports อยู่บนสุดแล้ว) ====================
 @st.cache_resource
 def build_and_eval():
-    from sklearn.model_selection import train_test_split
-    from sklearn.metrics import (accuracy_score, precision_score, recall_score,
-                                 f1_score, roc_curve, confusion_matrix)
-    from imblearn.over_sampling import SMOTE
-
     df = make_data(20000)
     X = df.drop(columns=["Class"]); y = df["Class"]
     scaler = StandardScaler()
@@ -220,8 +220,9 @@ def build_and_eval():
     best_name = comp.sort_values("F1", ascending=False).iloc[0]["Model"]
     return trained, scaler, comp, best_name, np.array(y_te), preds, probas
 
+# ✅ ฟังก์ชันนี้ไม่ต้อง import อะไรเพิ่มแล้ว (มีอยู่บนสุด)
 def make_figures(comp, y_te, preds, probas, best_name):
-    # 1) กราฟแท่งเปรียบเทียบ
+    # 1) กราฟแท่ง
     fig_bar, ax = plt.subplots(figsize=(9, 4.5))
     x = np.arange(len(comp)); w = .2
     for i, col in enumerate(["Accuracy", "Precision", "Recall", "F1"]):
@@ -238,7 +239,7 @@ def make_figures(comp, y_te, preds, probas, best_name):
     ax.set_title("ROC Curve"); ax.set_xlabel("FPR"); ax.set_ylabel("TPR")
     ax.legend(loc="lower right")
 
-    # 3) Confusion Matrix โมเดลที่ดีที่สุด
+    # 3) Confusion Matrix
     cm = confusion_matrix(y_te, preds[best_name])
     fig_cm, ax = plt.subplots(figsize=(5.5, 4.5))
     im = ax.imshow(cm, cmap="Greens")
@@ -276,7 +277,7 @@ if page == "หน้าหลัก":
         st.markdown('<div class="grad-title">ระบบตรวจจับธุรกรรมที่น่าสงสัย</div>', unsafe_allow_html=True)
         st.markdown('<div class="hazard-line"></div>', unsafe_allow_html=True)
         st.caption("🔍 การจำแนกธุรกรรมปกติและธุรกรรมทุจริตด้วยเทคนิคการเรียนรู้ของเครื่อง")
-    with hd2:  # ✅ ข้อมูลผู้พัฒนาปรากฏบนหน้าหลัก (ตามโจทย์)
+    with hd2:
         with st.container(border=True):
             pc1, pc2 = st.columns([1, 2], gap="small")
             with pc1:
@@ -344,7 +345,7 @@ if page == "หน้าหลัก":
                 st.markdown("**👥 K-Nearest Neighbors (K-NN)**")
                 st.caption("📏 จำแนกจาก k เพื่อนบ้านที่ใกล้ที่สุด ต้อง scaling ก่อน")
 
-    with t4:  # ✅ ตาราง + กราฟ สร้างสดในเว็บ
+    with t4:
         if EV is None:
             with st.container(border=True):
                 st.info("⏳ ยังไม่มีผลการประเมิน — กดปุ่มเพื่อฝึกโมเดลและสร้างตาราง+กราฟอัตโนมัติ")
