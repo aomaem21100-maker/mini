@@ -396,27 +396,28 @@ if page == "🏠 หน้าหลัก":
     st.caption("📚 จัดทำเพื่อประกอบการเรียนวิชา Machine Learning • 🛠️ พัฒนาด้วย Python, scikit-learn, Streamlit")
 
 # ================================================================
-#      👤 หน้าผู้พัฒนา (กึ่งกลาง + รูปวงกลมสมส่วน ชัวร์ทุกเวอร์ชัน)
+#      👤 หน้าผู้พัฒนา (กึ่งกลางสมบูรณ์ + รูปวงกลมชัวร์)
 # ================================================================
 else:
     st.markdown("""
     <style>
-    /* ✅ รูปโปรไฟล์: วงกลม สมส่วน ไม่ตัดหัว (selector ตรง ไม่พึ่ง testid) */
+    /* ✅ บังคับรูปวงกลมสมส่วนด้วย !important (กัน Streamlit ทับ) */
     img {
-        display: block; margin: 0 auto;
-        aspect-ratio: 1 / 1;
-        object-fit: cover;
-        object-position: center top;
-        border-radius: 50%;
-        border: 5px solid transparent;
+        display: block !important;
+        margin: 0 auto !important;
+        aspect-ratio: 1 / 1 !important;
+        object-fit: cover !important;
+        object-position: center top !important;
+        border-radius: 50% !important;
+        border: 5px solid transparent !important;
         background: linear-gradient(#212B3B, #212B3B) padding-box,
-                    linear-gradient(135deg, #39FF14, #6A3AB2) border-box;
-        box-shadow: 0 0 40px rgba(57, 255, 20, .4);
+                    linear-gradient(135deg, #39FF14, #6A3AB2) border-box !important;
+        box-shadow: 0 0 40px rgba(57, 255, 20, .4) !important;
         transition: all 0.3s ease;
     }
     img:hover {
         transform: scale(1.03);
-        box-shadow: 0 0 50px rgba(57, 255, 20, .6);
+        box-shadow: 0 0 50px rgba(57, 255, 20, .6) !important;
     }
 
     .dev-head { text-align: center; margin-top: 1rem; }
@@ -455,7 +456,7 @@ else:
     </style>
     """, unsafe_allow_html=True)
 
-    # ✅ จัดกึ่งกลางด้วยคอลัมน์ (ไม่พึ่ง CSS testid)
+    # ✅ จัดทั้งหน้ากึ่งกลางด้วยคอลัมน์
     _, mid, _ = st.columns([1, 2.2, 1])
     with mid:
         st.markdown("""
@@ -465,8 +466,11 @@ else:
         </div>
         """, unsafe_allow_html=True)
 
+        # ✅ จัดรูปกึ่งกลางด้วยคอลัมน์ซ้อน (ชัวร์กว่า margin auto)
         if PHOTO:
-            st.image(PHOTO, width=240)
+            c1, c2, c3 = st.columns([1, 1.2, 1])
+            with c2:
+                st.image(PHOTO, use_container_width=True)
         else:
             st.markdown('<div class="dev-avatar">👤</div>', unsafe_allow_html=True)
 
