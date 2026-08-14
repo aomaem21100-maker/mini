@@ -153,11 +153,10 @@ def show_developer_info():
     with col2:
         st.markdown("### 📇 ข้อมูลส่วนตัว")
         st.markdown("""
-        <div class="info-row"><span class="label">🆔 รหัสนักศึกษา</span><span class="value">63xxxxxxxx</span></div>
-        <div class="info-row"><span class="label">👤 ชื่อ-นามสกุล</span><span class="value">……………</span></div>
-        <div class="info-row"><span class="label">📚 หมู่เรียน</span><span class="value">……</span></div>
+        <div class="info-row"><span class="label">🆔 รหัสนักศึกษา</span><span class="value">664245024</span></div>
+        <div class="info-row"><span class="label">👤 ชื่อ-นามสกุล</span><span class="value">นาย จตุรภัทร สถาปิตานนท์</span></div>
+        <div class="info-row"><span class="label">📚 หมู่เรียน</span><span class="value">66/43</span></div>
         <div class="info-row"><span class="label">🎓 สาขา</span><span class="value">วิทยาการคอมพิวเตอร์</span></div>
-        <div class="info-row"><span class="label">🏫 สถาบัน</span><span class="value">……………</span></div>
         """, unsafe_allow_html=True)
 
     st.markdown("---")
