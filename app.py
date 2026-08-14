@@ -7,7 +7,6 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-# ✅ Import ทั้งหมดไว้บนสุด (แก้ NameError)
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import (accuracy_score, precision_score, recall_score,
@@ -20,21 +19,20 @@ from imblearn.over_sampling import SMOTE
 
 st.set_page_config(page_title="Machine Learning Hub", page_icon="🤖", layout="wide")
 
-# ===== กราฟโทน Eva =====
 plt.rcParams.update({
     "figure.facecolor": "#212B3B", "axes.facecolor": "#212B3B",
     "axes.edgecolor": "#3A465C", "axes.labelcolor": "#D5DCEA",
     "text.color": "#D5DCEA", "xtick.color": "#93A1B8", "ytick.color": "#93A1B8",
-    "legend.facecolor": "#212B3B", "grid.color": "#3A465C",
-    "font.size": 10,
+    "legend.facecolor": "#212B3B", "grid.color": "#3A465C", "font.size": 10,
 })
 EVA_COLORS = ["#39FF14", "#6A3AB2", "#FF7A00", "#4CC9F0"]
 
-# ==================== EVANGELION THEME ====================
+# ==================== THEME: Evangelion (หน้าหลัก + Sidebar) ====================
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Orbitron:wght@500;700;900&family=Inter:wght@400;600;700&display=swap');
 
+/* พื้นหลังหลัก #293242 + กริดเรืองแสง */
 div[data-testid="stAppViewContainer"] > section.main {
     background-color: #293242;
     background-image:
@@ -44,6 +42,7 @@ div[data-testid="stAppViewContainer"] > section.main {
 }
 #MainMenu, header, footer { visibility: hidden; }
 
+/* ===== Sidebar #D4D2F2 + ชื่อ gradient ดำ ===== */
 section[data-testid="stSidebar"] { background: #D4D2F2; border-right: 2px solid #6A3AB2; }
 section[data-testid="stSidebar"] p,
 section[data-testid="stSidebar"] span,
@@ -59,7 +58,6 @@ section[data-testid="stSidebar"] label { color: #1A1A2E; }
     border: none; height: 3px; margin: .9rem 0 1.2rem 0;
     background: repeating-linear-gradient(45deg, #FF7A00 0 10px, #14141E 10px 20px);
 }
-
 section[data-testid="stSidebar"] div[role="radiogroup"] input[type="radio"] { display: none; }
 section[data-testid="stSidebar"] div[role="radiogroup"] label {
     display: block; padding: .75rem 1rem; border-radius: 8px;
@@ -73,6 +71,7 @@ section[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked)
     font-family: 'Orbitron', 'IBM Plex Sans Thai', sans-serif;
 }
 
+/* ข้อความ */
 html, body, [class*="css"] { font-family: 'IBM Plex Sans Thai', 'Inter', sans-serif; }
 h1,h2,h3,h4 { color: #F2F5FB; font-weight: 600; }
 p, li { color: #D5DCEA; }
@@ -91,6 +90,7 @@ caption, small { color: #93A1B8 !important; }
     padding: .25rem .7rem; margin-bottom: .6rem; background: rgba(57,255,20,.08);
 }
 
+/* การ์ด / Metrics */
 div[data-testid="stVerticalBlockBorderWrapper"] {
     background: #212B3B; border: 1px solid #3A465C; border-radius: 14px;
     box-shadow: 0 2px 14px rgba(0,0,0,.35);
@@ -104,6 +104,7 @@ div[data-testid="stMetric"] div[data-testid="stMetricValue"] {
     color: #39FF14; font-weight: 700; text-shadow: 0 0 12px rgba(57,255,20,.35);
 }
 
+/* Tabs */
 div[data-testid="stTabs"] ul { gap: 0; border-bottom: 1px solid #3A465C; background: transparent; }
 div[data-testid="stTabs"] button {
     background: transparent; color: #93A1B8; border-radius: 0; font-weight: 500;
@@ -115,6 +116,7 @@ div[data-testid="stTabs"] button[aria-selected="true"] {
 }
 div[data-testid="stTabs"] button:hover { color: #39FF14; background: transparent; }
 
+/* ปุ่ม neon */
 div.stButton > button {
     background: #39FF14; color: #0A0A0A; border: none; border-radius: 8px;
     font-weight: 700; padding: .55rem 1.8rem;
@@ -123,6 +125,7 @@ div.stButton > button {
 }
 div.stButton > button:hover { background: #52FF33; box-shadow: 0 0 22px rgba(57,255,20,.55); }
 
+/* Inputs */
 input, textarea {
     background: #212B3B !important; border: 1px solid #3A465C !important;
     color: #F2F5FB !important; border-radius: 8px !important;
@@ -130,6 +133,7 @@ input, textarea {
 input:focus, textarea:focus { border-color: #39FF14 !important; box-shadow: 0 0 0 3px rgba(57,255,20,.15) !important; }
 div[data-baseweb="select"] > div { background: #212B3B !important; border: 1px solid #3A465C !important; color: #F2F5FB !important; }
 
+/* Progress / Alert / Expander */
 div[data-testid="stProgress"] > div { background: #1A2230; border-radius: 4px; }
 div[data-testid="stProgress"] > div > div {
     background: linear-gradient(90deg, #39FF14, #6A3AB2); border-radius: 4px;
@@ -147,13 +151,6 @@ img { border-radius: 10px; border: 1px solid #3A465C; }
 }
 
 .info-row { display: flex; gap: .6rem; padding: .4rem 0; font-size: .95rem; }
-.info-row .label { color: #93A1B8; min-width: 140px; }
-.info-row .value { color: #F2F5FB; font-weight: 600; }
-.tech-chip {
-    display: inline-block; margin: .2rem .35rem .2rem 0; padding: .4rem .9rem;
-    border-radius: 999px; border: 1px solid rgba(57,255,20,.6);
-    color: #39FF14; font-size: .82rem; font-weight: 600; background: rgba(57,255,20,.06);
-}
 .avatar-box {
     width: 100%; aspect-ratio: 1; border-radius: 14px;
     background: linear-gradient(135deg, rgba(106,58,178,.4), rgba(57,255,20,.25));
@@ -190,7 +187,6 @@ def make_data(n=20000, seed=42):
     data["Class"] = np.random.choice([0, 1], n, p=[0.9983, 0.0017])
     return pd.DataFrame(data)
 
-# ==================== ฝึก + ประเมินผล (imports อยู่บนสุดแล้ว) ====================
 @st.cache_resource
 def build_and_eval():
     df = make_data(20000)
@@ -220,9 +216,7 @@ def build_and_eval():
     best_name = comp.sort_values("F1", ascending=False).iloc[0]["Model"]
     return trained, scaler, comp, best_name, np.array(y_te), preds, probas
 
-# ✅ ฟังก์ชันนี้ไม่ต้อง import อะไรเพิ่มแล้ว (มีอยู่บนสุด)
 def make_figures(comp, y_te, preds, probas, best_name):
-    # 1) กราฟแท่ง
     fig_bar, ax = plt.subplots(figsize=(9, 4.5))
     x = np.arange(len(comp)); w = .2
     for i, col in enumerate(["Accuracy", "Precision", "Recall", "F1"]):
@@ -230,7 +224,6 @@ def make_figures(comp, y_te, preds, probas, best_name):
     ax.set_xticks(x); ax.set_xticklabels(comp["Model"], rotation=8)
     ax.set_ylim(0, 1); ax.legend(); ax.set_title("Model Comparison"); ax.grid(axis="y", alpha=.3)
 
-    # 2) ROC Curve
     fig_roc, ax = plt.subplots(figsize=(7, 5))
     for i, (name, pr) in enumerate(probas.items()):
         fpr, tpr, _ = roc_curve(y_te, pr)
@@ -239,7 +232,6 @@ def make_figures(comp, y_te, preds, probas, best_name):
     ax.set_title("ROC Curve"); ax.set_xlabel("FPR"); ax.set_ylabel("TPR")
     ax.legend(loc="lower right")
 
-    # 3) Confusion Matrix
     cm = confusion_matrix(y_te, preds[best_name])
     fig_cm, ax = plt.subplots(figsize=(5.5, 4.5))
     im = ax.imshow(cm, cmap="Greens")
@@ -267,7 +259,7 @@ page = st.sidebar.radio("นำทาง", ["หน้าหลัก", "ผู�
 EV = st.session_state.get("eval", None)
 
 # ================================================================
-#                         หน้าหลัก
+#                         หน้าหลัก (Eva)
 # ================================================================
 if page == "หน้าหลัก":
     st.markdown('<span class="tag-cyber">MACHINE LEARNING PROJECT</span>', unsafe_allow_html=True)
@@ -292,7 +284,7 @@ if page == "หน้าหลัก":
     m1.metric("📊 ขนาดข้อมูล", "20,000 รายการ")
     m2.metric("🔢 คุณลักษณะ", "30 ตัว")
     m3.metric("🏆 โมเดลที่ดีที่สุด", EV[3] if EV else "–")
-    m4.metric("📈 F1-Score", f"{EV[2].sort_values('F1', ascending=False).iloc[0]['F1']:.2%}" if EV else "–")
+    m4.metric("📈 คะแนน F1", f"{EV[2].sort_values('F1', ascending=False).iloc[0]['F1']:.2%}" if EV else "–")
 
     st.markdown("")
 
@@ -413,25 +405,58 @@ if page == "หน้าหลัก":
     st.caption("📚 จัดทำเพื่อประกอบการเรียนวิชา Machine Learning • 🛠️ พัฒนาด้วย Python, scikit-learn, Streamlit")
 
 # ================================================================
-#                         ผู้พัฒนา
+#            ผู้พัฒนา (โทนรูป 2: gradient ฟ้า→ม่วง บนกรมท่า)
 # ================================================================
 else:
-    st.markdown('<span class="tag-cyber">DEVELOPER</span>', unsafe_allow_html=True)
-    st.markdown('<div class="grad-title">ผู้พัฒนาโปรเจกต์</div>', unsafe_allow_html=True)
-    st.markdown('<div class="hazard-line"></div>', unsafe_allow_html=True)
+    st.markdown("""
+    <style>
+    /* การ์ดในหน้าผู้พัฒนาเป็นกรมท่าเข้มแบบรูป 2 */
+    div[data-testid="stVerticalBlockBorderWrapper"] { background: #0D1526; border: 1px solid #16233C; }
+
+    .dev2-title {
+        font-size: 2rem; font-weight: 800;
+        background: linear-gradient(90deg, #2DE0C8 0%, #4CC9F0 45%, #8B5CF6 100%);
+        -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .dev2-line {
+        height: 2px; border: none; margin: .6rem 0 1.2rem 0;
+        background: linear-gradient(90deg, #2DE0C8, #8B5CF6); border-radius: 2px;
+    }
+    .dev2-label { color: #8FA3C4; min-width: 140px; }
+    .dev2-value { color: #E6EDF7; font-weight: 600; }
+    .dev2-chip {
+        display: inline-block; margin: .2rem .35rem .2rem 0; padding: .4rem .9rem;
+        border-radius: 999px; border: 1px solid rgba(45,224,200,.5);
+        color: #2DE0C8; font-size: .82rem; font-weight: 600; background: rgba(45,224,200,.06);
+    }
+    .dev2-chip.purple { border-color: rgba(139,92,246,.5); color: #8B5CF6; background: rgba(139,92,246,.06); }
+    .dev2-avatar {
+        width: 100%; aspect-ratio: 1; border-radius: 16px;
+        background: linear-gradient(135deg, rgba(45,224,200,.25), rgba(139,92,246,.25));
+        border: 2px solid #2DE0C8;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 3rem; box-shadow: 0 0 20px rgba(45,224,200,.3);
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    st.markdown('<div class="dev2-title">👤 ผู้พัฒนาโปรเจกต์</div>', unsafe_allow_html=True)
+    st.markdown('<hr class="dev2-line">', unsafe_allow_html=True)
 
     with st.container(border=True):
         a1, a2 = st.columns([1, 2], gap="large")
         with a1:
-            if PHOTO: st.image(PHOTO, use_container_width=True)
-            else: st.markdown('<div class="avatar-box">👤</div>', unsafe_allow_html=True)
+            if PHOTO:
+                st.image(PHOTO, use_container_width=True)
+            else:
+                st.markdown('<div class="dev2-avatar">👤</div>', unsafe_allow_html=True)
         with a2:
             st.markdown("""
-            <div class="info-row"><span class="label">👤 ชื่อ-นามสกุล</span><span class="value">นาย จตุรภัทร สถาปีตานนท์</span></div>
-            <div class="info-row"><span class="label">🆔 รหัสนักศึกษา</span><span class="value">664245024</span></div>
-            <div class="info-row"><span class="label">📚 หมู่เรียน</span><span class="value">66/43</span></div>
-            <div class="info-row"><span class="label">🎓 สาขา</span><span class="value">วิทยาการคอมพิวเตอร์</span></div>
-            <div class="info-row"><span class="label">‍🏫 อาจารย์ผู้สอน</span><span class="value">……………</span></div>
+            <div class="info-row"><span class="dev2-label">👤 ชื่อ-นามสกุล</span><span class="dev2-value">นาย จตุรภัทร สถาปีตานนท์</span></div>
+            <div class="info-row"><span class="dev2-label">🆔 รหัสนักศึกษา</span><span class="dev2-value">664245024</span></div>
+            <div class="info-row"><span class="dev2-label">📚 หมู่เรียน</span><span class="dev2-value">66/43</span></div>
+            <div class="info-row"><span class="dev2-label">🎓 สาขา</span><span class="dev2-value">วิทยาการคอมพิวเตอร์</span></div>
+            <div class="info-row"><span class="dev2-label">🏫 อาจารย์ผู้สอน</span><span class="dev2-value">……………</span></div>
             """, unsafe_allow_html=True)
 
     st.markdown("")
@@ -442,12 +467,12 @@ else:
 
         st.subheader("🛠️ เทคโนโลยีที่ใช้")
         st.markdown("""
-        <span class="tech-chip">🐍 Python</span>
-        <span class="tech-chip">🤖 scikit-learn</span>
-        <span class="tech-chip">🚀 Streamlit</span>
-        <span class="tech-chip">⚖️ imbalanced-learn</span>
-        <span class="tech-chip">📊 matplotlib</span>
-        <span class="tech-chip">🐼 pandas</span>
+        <span class="dev2-chip">🐍 Python</span>
+        <span class="dev2-chip">🤖 scikit-learn</span>
+        <span class="dev2-chip">🚀 Streamlit</span>
+        <span class="dev2-chip purple">⚖️ imbalanced-learn</span>
+        <span class="dev2-chip purple">📊 matplotlib</span>
+        <span class="dev2-chip purple">🐼 pandas</span>
         """, unsafe_allow_html=True)
 
         st.subheader("🔗 ลิงก์ที่เกี่ยวข้อง")
