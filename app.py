@@ -27,7 +27,7 @@ plt.rcParams.update({
 })
 EVA_COLORS = ["#39FF14", "#6A3AB2", "#FF7A00", "#4CC9F0"]
 
-# ==================== THEME: Evangelion (หน้าหลัก + Sidebar) ====================
+# ==================== THEME: Evangelion ====================
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=Orbitron:wght@500;700;900&family=Inter:wght@400;600;700&display=swap');
@@ -41,7 +41,7 @@ div[data-testid="stAppViewContainer"] > section.main {
 }
 #MainMenu, header, footer { visibility: hidden; }
 
-/* Sidebar #D4D2F2 + ชื่อ gradient ดำ */
+/* ===== Sidebar (แถบซ้ายมือ) #D4D2F2 + ชื่อ gradient ดำ ===== */
 section[data-testid="stSidebar"] { background: #D4D2F2; border-right: 2px solid #6A3AB2; }
 section[data-testid="stSidebar"] p,
 section[data-testid="stSidebar"] span,
@@ -57,11 +57,12 @@ section[data-testid="stSidebar"] label { color: #1A1A2E; }
     border: none; height: 3px; margin: .9rem 0 1.2rem 0;
     background: repeating-linear-gradient(45deg, #FF7A00 0 10px, #14141E 10px 20px);
 }
+/* เมนูซ้ายมือแบบแท็บ */
 section[data-testid="stSidebar"] div[role="radiogroup"] input[type="radio"] { display: none; }
 section[data-testid="stSidebar"] div[role="radiogroup"] label {
-    display: block; padding: .75rem 1rem; border-radius: 8px;
+    display: block; padding: .8rem 1rem; border-radius: 8px;
     color: #3A3A55; font-weight: 600; cursor: pointer;
-    border-left: 3px solid transparent; margin-bottom: .35rem; transition: all .2s ease;
+    border-left: 3px solid transparent; margin-bottom: .4rem; transition: all .2s ease;
 }
 section[data-testid="stSidebar"] div[role="radiogroup"] label:hover { color: #000; background: rgba(106,58,178,.12); }
 section[data-testid="stSidebar"] div[role="radiogroup"] label:has(input:checked) {
@@ -141,14 +142,6 @@ img { border-radius: 10px; border: 1px solid #3A465C; }
 .hazard-line {
     height: 4px; border-radius: 2px; margin: .5rem 0 1rem 0;
     background: repeating-linear-gradient(45deg, #FF7A00 0 12px, #14141E 12px 24px);
-}
-
-.info-row { display: flex; gap: .6rem; padding: .4rem 0; font-size: .95rem; }
-.avatar-box {
-    width: 100%; aspect-ratio: 1; border-radius: 14px;
-    background: linear-gradient(135deg, rgba(106,58,178,.4), rgba(57,255,20,.25));
-    border: 2px solid #6A3AB2; display: flex; align-items: center; justify-content: center;
-    font-size: 2.6rem; box-shadow: 0 0 18px rgba(106,58,178,.5);
 }
 </style>
 """, unsafe_allow_html=True)
@@ -244,35 +237,23 @@ def train_now(key):
             st.session_state["eval"] = build_and_eval()
         st.rerun()
 
-# ==================== SIDEBAR ====================
+# ==================== ✅ แถบนำทางซ้ายมือ (แยก 2 หน้าชัดเจน) ====================
 st.sidebar.markdown('<div class="hub-title">MACHINE LEARNING HUB</div>', unsafe_allow_html=True)
 st.sidebar.markdown('<hr class="hub-hr">', unsafe_allow_html=True)
-page = st.sidebar.radio("นำทาง", ["หน้าหลัก", "ผู้พัฒนา"], label_visibility="collapsed")
+page = st.sidebar.radio("นำทาง", ["🏠 หน้าหลัก", "👤 ผู้พัฒนา"], label_visibility="collapsed")
 
 EV = st.session_state.get("eval", None)
 
 # ================================================================
-#                         หน้าหลัก (Eva)
+#              หน้าหลัก — เนื้อหาโปรเจกต์ล้วน (ไม่มีการ์ดผู้พัฒนา)
 # ================================================================
-if page == "หน้าหลัก":
+if page == "🏠 หน้าหลัก":
     st.markdown('<span class="tag-cyber">MACHINE LEARNING PROJECT</span>', unsafe_allow_html=True)
+    st.markdown('<div class="grad-title">ระบบตรวจจับธุรกรรมที่น่าสงสัย</div>', unsafe_allow_html=True)
+    st.markdown('<div class="hazard-line"></div>', unsafe_allow_html=True)
+    st.caption("🔍 การจำแนกธุรกรรมปกติและธุรกรรมทุจริตด้วยเทคนิคการเรียนรู้ของเครื่อง")
 
-    hd1, hd2 = st.columns([3, 1], gap="large")
-    with hd1:
-        st.markdown('<div class="grad-title">ระบบตรวจจับธุรกรรมที่น่าสงสัย</div>', unsafe_allow_html=True)
-        st.markdown('<div class="hazard-line"></div>', unsafe_allow_html=True)
-        st.caption("🔍 การจำแนกธุรกรรมปกติและธุรกรรมทุจริตด้วยเทคนิคการเรียนรู้ของเครื่อง")
-    with hd2:
-        with st.container(border=True):
-            pc1, pc2 = st.columns([1, 2], gap="small")
-            with pc1:
-                if PHOTO: st.image(PHOTO, use_container_width=True)
-                else: st.markdown('<div class="avatar-box">👤</div>', unsafe_allow_html=True)
-            with pc2:
-                st.markdown("**นาย จตุรภัทร สถาปีตานนท์**")
-                st.caption("🆔 664245024")
-                st.caption("📚 หมู่เรียน 66/43")
-
+    st.markdown("")
     m1, m2, m3, m4 = st.columns(4)
     m1.metric("📊 ขนาดข้อมูล", "20,000 รายการ")
     m2.metric("🔢 คุณลักษณะ", "30 ตัว")
@@ -398,16 +379,12 @@ if page == "หน้าหลัก":
     st.caption("📚 จัดทำเพื่อประกอบการเรียนวิชา Machine Learning • 🛠️ พัฒนาด้วย Python, scikit-learn, Streamlit")
 
 # ================================================================
-#      ผู้พัฒนา — เลย์เอาต์แบบตัวอย่าง (กลางจอ) แต่สี Eva เดิม
+#      👤 หน้าผู้พัฒนา — แยกอิสระ (เลย์เอาต์กลางจอ สี Eva)
 # ================================================================
 else:
     st.markdown("""
     <style>
-    /* การ์ดกึ่งกลางจอ */
-    div[data-testid="stVerticalBlockBorderWrapper"] {
-        max-width: 680px; margin: 0 auto;
-    }
-    /* รูปวงกลม + ขอบ gradient เขียว→ม่วง เรืองแสง */
+    div[data-testid="stVerticalBlockBorderWrapper"] { max-width: 680px; margin: 0 auto; }
     div[data-testid="stAppViewContainer"] section.main img {
         display: block; margin: 0 auto;
         width: 215px; height: 215px; object-fit: cover; border-radius: 50%;
@@ -431,11 +408,7 @@ else:
         display: flex; align-items: center; justify-content: center;
         font-size: 4.5rem; box-shadow: 0 0 34px rgba(57,255,20,.35);
     }
-    .dev-name {
-        text-align: center; font-size: 1.35rem; font-weight: 700;
-        color: #F2F5FB; margin: .3rem 0 1rem 0;
-    }
-    /* แถวข้อมูลแบบตาราง (ซ้ายป้าย / ขวาค่า) */
+    .dev-name { text-align: center; font-size: 1.35rem; font-weight: 700; color: #F2F5FB; margin: .3rem 0 1rem 0; }
     .info-row {
         display: flex; justify-content: space-between; gap: 1rem;
         padding: .8rem .2rem; border-top: 1px solid #3A465C; font-size: .95rem;
@@ -454,7 +427,6 @@ else:
     </style>
     """, unsafe_allow_html=True)
 
-    # ===== หัวข้อกลางจอ =====
     st.markdown("""
     <div class="dev-head">
         <div class="dev-title">ผู้พัฒนา</div>
@@ -462,7 +434,6 @@ else:
     </div>
     """, unsafe_allow_html=True)
 
-    # ===== รูปวงกลมกลางจอ =====
     if PHOTO:
         st.image(PHOTO)
     else:
@@ -470,7 +441,6 @@ else:
 
     st.markdown("")
 
-    # ===== การ์ดข้อมูลกึ่งกลาง =====
     with st.container(border=True):
         st.markdown('<div class="dev-name">นาย จตุรภัทร สถาปีตานนท์</div>', unsafe_allow_html=True)
         st.markdown("""
