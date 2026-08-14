@@ -244,10 +244,10 @@ def train_now(key):
             st.session_state["eval"] = build_and_eval()
         st.rerun()
 
-# ==================== ✅ ระบบนำทาง (สลับหน้า + ย้อนกลับ) ====================
+# ==================== SIDEBAR ====================
 st.sidebar.markdown('<div class="hub-title">MACHINE LEARNING HUB</div>', unsafe_allow_html=True)
 st.sidebar.markdown('<hr class="hub-hr">', unsafe_allow_html=True)
-page = st.sidebar.radio("นำทาง", ["หน้าหลัก", "ผู้พัฒนา"], label_visibility="collapsed", key="nav")
+page = st.sidebar.radio("นำทาง", ["หน้าหลัก", "ผู้พัฒนา"], label_visibility="collapsed")
 
 EV = st.session_state.get("eval", None)
 
@@ -272,10 +272,6 @@ if page == "หน้าหลัก":
                 st.markdown("**นาย จตุรภัทร สถาปีตานนท์**")
                 st.caption("🆔 664245024")
                 st.caption("📚 หมู่เรียน 66/43")
-            # ✅ ปุ่มไปหน้าผู้พัฒนา
-            if st.button("👤 ดูหน้าผู้พัฒนา", use_container_width=True):
-                st.session_state["nav"] = "ผู้พัฒนา"
-                st.rerun()
 
     m1, m2, m3, m4 = st.columns(4)
     m1.metric("📊 ขนาดข้อมูล", "20,000 รายการ")
@@ -402,91 +398,108 @@ if page == "หน้าหลัก":
     st.caption("📚 จัดทำเพื่อประกอบการเรียนวิชา Machine Learning • 🛠️ พัฒนาด้วย Python, scikit-learn, Streamlit")
 
 # ================================================================
-#     ผู้พัฒนา — หน้าแยกโทนรูป 2 (กรมท่าเข้ม + กริดฟ้า + ปุ่มย้อนกลับ)
+#      ผู้พัฒนา — เลย์เอาต์แบบตัวอย่าง (กลางจอ) แต่สี Eva เดิม
 # ================================================================
 else:
     st.markdown("""
     <style>
-    /* ✅ เปลี่ยนพื้นหลังทั้งหน้าเป็นโทนรูป 2 ให้เห็นชัดว่าสลับหน้า */
-    div[data-testid="stAppViewContainer"] > section.main {
-        background-color: #0A101C;
-        background-image:
-            linear-gradient(rgba(45,224,200,0.045) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(45,224,200,0.045) 1px, transparent 1px);
-        background-size: 42px 42px;
+    /* การ์ดกึ่งกลางจอ */
+    div[data-testid="stVerticalBlockBorderWrapper"] {
+        max-width: 680px; margin: 0 auto;
     }
-    div[data-testid="stVerticalBlockBorderWrapper"] { background: #0D1526; border: 1px solid #16233C; }
-
-    .dev2-title {
-        font-size: 2rem; font-weight: 800;
-        background: linear-gradient(90deg, #2DE0C8 0%, #4CC9F0 45%, #8B5CF6 100%);
+    /* รูปวงกลม + ขอบ gradient เขียว→ม่วง เรืองแสง */
+    div[data-testid="stAppViewContainer"] section.main img {
+        display: block; margin: 0 auto;
+        width: 215px; height: 215px; object-fit: cover; border-radius: 50%;
+        border: 4px solid transparent;
+        background: linear-gradient(#212B3B, #212B3B) padding-box,
+                    linear-gradient(135deg, #39FF14, #6A3AB2) border-box;
+        box-shadow: 0 0 34px rgba(57, 255, 20, .35);
+    }
+    .dev-head { text-align: center; margin-top: 1.5rem; }
+    .dev-title {
+        font-size: 2.6rem; font-weight: 800;
+        background: linear-gradient(90deg, #39FF14 0%, #7EF29A 35%, #6A3AB2 75%, #FF7A00 100%);
         -webkit-background-clip: text; background-clip: text; color: transparent;
+        text-shadow: 0 0 24px rgba(57, 255, 20, .25);
     }
-    .dev2-line {
-        height: 2px; border: none; margin: .6rem 0 1.2rem 0;
-        background: linear-gradient(90deg, #2DE0C8, #8B5CF6); border-radius: 2px;
-    }
-    .dev2-label { color: #8FA3C4; min-width: 140px; }
-    .dev2-value { color: #E6EDF7; font-weight: 600; }
-    .dev2-chip {
-        display: inline-block; margin: .2rem .35rem .2rem 0; padding: .4rem .9rem;
-        border-radius: 999px; border: 1px solid rgba(45,224,200,.5);
-        color: #2DE0C8; font-size: .82rem; font-weight: 600; background: rgba(45,224,200,.06);
-    }
-    .dev2-chip.purple { border-color: rgba(139,92,246,.5); color: #8B5CF6; background: rgba(139,92,246,.06); }
-    .dev2-avatar {
-        width: 100%; aspect-ratio: 1; border-radius: 16px;
-        background: linear-gradient(135deg, rgba(45,224,200,.25), rgba(139,92,246,.25));
-        border: 2px solid #2DE0C8;
+    .dev-sub { color: #93A1B8; letter-spacing: 1px; font-size: .95rem; margin-top: .3rem; }
+    .dev-avatar {
+        width: 215px; height: 215px; border-radius: 50%; margin: 0 auto;
+        background: linear-gradient(135deg, rgba(57,255,20,.25), rgba(106,58,178,.4));
+        border: 4px solid #6A3AB2;
         display: flex; align-items: center; justify-content: center;
-        font-size: 3rem; box-shadow: 0 0 20px rgba(45,224,200,.3);
+        font-size: 4.5rem; box-shadow: 0 0 34px rgba(57,255,20,.35);
     }
+    .dev-name {
+        text-align: center; font-size: 1.35rem; font-weight: 700;
+        color: #F2F5FB; margin: .3rem 0 1rem 0;
+    }
+    /* แถวข้อมูลแบบตาราง (ซ้ายป้าย / ขวาค่า) */
+    .info-row {
+        display: flex; justify-content: space-between; gap: 1rem;
+        padding: .8rem .2rem; border-top: 1px solid #3A465C; font-size: .95rem;
+    }
+    .info-row:first-child { border-top: none; }
+    .info-row .label { color: #93A1B8; }
+    .info-row .value { color: #F2F5FB; font-weight: 600; }
+    .dev-center { text-align: center; }
+    .dev2-chip {
+        display: inline-block; margin: .2rem .3rem; padding: .4rem .9rem;
+        border-radius: 999px; border: 1px solid rgba(57,255,20,.55);
+        color: #39FF14; font-size: .82rem; font-weight: 600; background: rgba(57,255,20,.06);
+    }
+    .dev2-chip.purple { border-color: rgba(106,58,178,.6); color: #B794F6; background: rgba(106,58,178,.1); }
+    .dev2-chip.orange { border-color: rgba(255,122,0,.55); color: #FF7A00; background: rgba(255,122,0,.07); }
     </style>
     """, unsafe_allow_html=True)
 
-    # ✅ ปุ่มย้อนกลับหน้าหลัก
-    bk, _ = st.columns([1, 3])
-    with bk:
-        if st.button("⬅️ ย้อนกลับหน้าหลัก", use_container_width=True):
-            st.session_state["nav"] = "หน้าหลัก"
-            st.rerun()
+    # ===== หัวข้อกลางจอ =====
+    st.markdown("""
+    <div class="dev-head">
+        <div class="dev-title">ผู้พัฒนา</div>
+        <div class="dev-sub">ข้อมูลผู้จัดทำโปรเจค Machine Learning Hub</div>
+    </div>
+    """, unsafe_allow_html=True)
 
-    st.markdown('<div class="dev2-title">👤 ผู้พัฒนาโปรเจกต์</div>', unsafe_allow_html=True)
-    st.markdown('<hr class="dev2-line">', unsafe_allow_html=True)
-
-    with st.container(border=True):
-        a1, a2 = st.columns([1, 2], gap="large")
-        with a1:
-            if PHOTO:
-                st.image(PHOTO, use_container_width=True)
-            else:
-                st.markdown('<div class="dev2-avatar">👤</div>', unsafe_allow_html=True)
-        with a2:
-            st.markdown("""
-            <div class="info-row"><span class="dev2-label">👤 ชื่อ-นามสกุล</span><span class="dev2-value">นาย จตุรภัทร สถาปีตานนท์</span></div>
-            <div class="info-row"><span class="dev2-label">🆔 รหัสนักศึกษา</span><span class="value" style="color:#E6EDF7; font-weight:600;">664245024</span></div>
-            <div class="info-row"><span class="dev2-label">📚 หมู่เรียน</span><span class="dev2-value">66/43</span></div>
-            <div class="info-row"><span class="dev2-label">🎓 สาขา</span><span class="dev2-value">วิทยาการคอมพิวเตอร์</span></div>
-            <div class="info-row"><span class="dev2-label">🏫 อาจารย์ผู้สอน</span><span class="dev2-value">……………</span></div>
-            """, unsafe_allow_html=True)
+    # ===== รูปวงกลมกลางจอ =====
+    if PHOTO:
+        st.image(PHOTO)
+    else:
+        st.markdown('<div class="dev-avatar">👤</div>', unsafe_allow_html=True)
 
     st.markdown("")
+
+    # ===== การ์ดข้อมูลกึ่งกลาง =====
     with st.container(border=True):
-        st.subheader("📝 เกี่ยวกับโปรเจกต์")
+        st.markdown('<div class="dev-name">นาย จตุรภัทร สถาปีตานนท์</div>', unsafe_allow_html=True)
+        st.markdown("""
+        <div class="info-row"><span class="label">รหัสนักศึกษา</span><span class="value">664245024</span></div>
+        <div class="info-row"><span class="label">หมู่เรียน</span><span class="value">Sec. 66/43</span></div>
+        <div class="info-row"><span class="label">สาขา</span><span class="value">วิทยาการคอมพิวเตอร์</span></div>
+        <div class="info-row"><span class="label">อาจารย์ผู้สอน</span><span class="value">……………</span></div>
+        """, unsafe_allow_html=True)
+
+    st.markdown("")
+
+    with st.container(border=True):
+        st.markdown('<div class="dev-center"><h3 style="margin:.2rem 0 .5rem 0;">📝 เกี่ยวกับโปรเจกต์</h3></div>', unsafe_allow_html=True)
         st.write("💡 โครงงานนี้เป็นส่วนหนึ่งของวิชา Machine Learning โดยมีวัตถุประสงค์เพื่อศึกษาและประยุกต์ใช้"
                  "เทคนิคการเรียนรู้ของเครื่องในการตรวจจับธุรกรรมบัตรเครดิตที่น่าสงสัย")
 
-        st.subheader("🛠️ เทคโนโลยีที่ใช้")
+        st.markdown('<div class="dev-center"><h3 style="margin:1rem 0 .5rem 0;">🛠️ เทคโนโลยีที่ใช้</h3></div>', unsafe_allow_html=True)
         st.markdown("""
-        <span class="dev2-chip">🐍 Python</span>
-        <span class="dev2-chip">🤖 scikit-learn</span>
-        <span class="dev2-chip">🚀 Streamlit</span>
-        <span class="dev2-chip purple">⚖️ imbalanced-learn</span>
-        <span class="dev2-chip purple">📊 matplotlib</span>
-        <span class="dev2-chip purple">🐼 pandas</span>
+        <div class="dev-center">
+            <span class="dev2-chip">🐍 Python</span>
+            <span class="dev2-chip">🤖 scikit-learn</span>
+            <span class="dev2-chip">🚀 Streamlit</span>
+            <span class="dev2-chip purple">⚖️ imbalanced-learn</span>
+            <span class="dev2-chip purple">📊 matplotlib</span>
+            <span class="dev2-chip orange">🐼 pandas</span>
+        </div>
         """, unsafe_allow_html=True)
 
-        st.subheader("🔗 ลิงก์ที่เกี่ยวข้อง")
+        st.markdown('<div class="dev-center"><h3 style="margin:1rem 0 .5rem 0;">🔗 ลิงก์ที่เกี่ยวข้อง</h3></div>', unsafe_allow_html=True)
         st.markdown("- 🌐 [GitHub Profile](https://github.com/aomaem21100-maker?tab=repositories)\n"
                     "- 📦 [Source Code โปรเจกต์นี้](https://github.com/aomaem21100-maker)\n"
                     "- 📚 [Dataset: Credit Card Fraud Detection (Kaggle)](https://www.kaggle.com/mlg-ulb/creditcardfraud)")
