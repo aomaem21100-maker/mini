@@ -42,6 +42,7 @@ div[data-testid="stAppViewContainer"] > section.main {
 }
 #MainMenu, header, footer { visibility: hidden; }
 
+/* ===== Sidebar ===== */
 section[data-testid="stSidebar"] { background: #D4D2F2; border-right: 2px solid #6A3AB2; }
 section[data-testid="stSidebar"] p,
 section[data-testid="stSidebar"] span,
@@ -58,19 +59,17 @@ section[data-testid="stSidebar"] label { color: #1A1A2E; }
     background: repeating-linear-gradient(45deg, #FF7A00 0 10px, #14141E 10px 20px);
 }
 
-section[data-testid="stSidebar"] .stButton > button {
+section[data-testid="stSidebar"] .stSelectbox { margin-top: 1rem; }
+section[data-testid="stSidebar"] .stSelectbox > div {
     background: #FFFFFF !important;
     border: 2px solid #6A3AB2 !important;
     border-radius: 10px;
     padding: 0.8rem 1rem;
     font-size: 1rem; font-weight: 600; color: #1A1A2E !important;
-    margin-bottom: 0.5rem;
-    transition: all 0.2s ease;
 }
-section[data-testid="stSidebar"] .stButton > button:hover {
+section[data-testid="stSidebar"] .stSelectbox > div:hover {
     border-color: #39FF14 !important;
     box-shadow: 0 0 12px rgba(57, 255, 20, 0.3);
-    color: #6A3AB2 !important;
 }
 
 html, body, [class*="css"] { font-family: 'IBM Plex Sans Thai', 'Inter', sans-serif; }
@@ -209,13 +208,13 @@ def make_figures(comp, y_te, preds, probas, best_name):
     x = np.arange(len(comp)); w = .2
     for i, col in enumerate(["Accuracy", "Precision", "Recall", "F1"]):
         ax.bar(x + i*w - 1.5*w, comp[col], w, label=col, color=EVA_COLORS[i])
-    ax.set_xticks(x, labels=comp["Model"], rotation=8)
+    ax.set_xticks(x); ax.set_xticklabels(comp["Model"], rotation=8)
     ax.set_ylim(0, 1); ax.legend(); ax.set_title("Model Comparison"); ax.grid(axis="y", alpha=.3)
 
     fig_roc, ax = plt.subplots(figsize=(7, 5))
     for i, (name, pr) in enumerate(probas.items()):
         fpr, tpr, _ = roc_curve(y_te, pr)
-        ax.plot(fpr, tpr, color=EVA_COLORS[i], label=name)
+        ax.plot(fpr, tpr, color=EVA_COLORS[i], label=name)แก้มาใหเลย
     ax.plot([0, 1], [0, 1], "--", color="#93A1B8", alpha=.6)
     ax.set_title("ROC Curve"); ax.set_xlabel("FPR"); ax.set_ylabel("TPR")
     ax.legend(loc="lower right")
@@ -223,8 +222,8 @@ def make_figures(comp, y_te, preds, probas, best_name):
     cm = confusion_matrix(y_te, preds[best_name])
     fig_cm, ax = plt.subplots(figsize=(5.5, 4.5))
     im = ax.imshow(cm, cmap="Greens")
-    ax.set_xticks([0, 1], labels=["Normal", "Fraud"])
-    ax.set_yticks([0, 1], labels=["Normal", "Fraud"])
+    ax.set_xticks([0, 1]); ax.set_yticks([0, 1])
+    ax.set_xticklabels(["Normal", "Fraud"]); ax.set_yticklabels(["Normal", "Fraud"])
     for ii in range(2):
         for jj in range(2):
             ax.text(jj, ii, f"{cm[ii, jj]:,}", ha="center", va="center",
@@ -233,30 +232,39 @@ def make_figures(comp, y_te, preds, probas, best_name):
     fig_cm.colorbar(im, ax=ax, fraction=.046)
     return fig_bar, fig_roc, fig_cm
 
-# ==================== ✅ ระบบนำทาง (Navigation) ====================
-if "page" not in st.session_state:
-    st.session_state.page = "home"
+def train_now(key):
+    if st.button("🚀 เริ่มต้นฝึกโมเดลและประเมินผล", use_container_width=True, key=key):
+        with st.spinner("⚙️ กำลังฝึก 4 โมเดล + สร้างกราฟประเมินผล..."):
+            st.session_state["eval"] = build_and_eval()
+        st.rerun()
 
-with st.sidebar:
-    st.markdown('<div class="hub-title">MACHINE LEARNING HUB</div>', unsafe_allow_html=True)
-    st.markdown('<hr class="hub-hr">', unsafe_allow_html=True)
-    st.markdown("### 📍 นำทาง")
-    
-    if st.button("🏠 หน้าหลัก", use_container_width=True):
-        st.session_state.page = "home"
-        
-    if st.button("👤 ผู้พัฒนา", use_container_width=True):
-        st.session_state.page = "dev"
-        
-    st.markdown("---")
-    st.caption("© 2568 • Machine Learning Hub")
+# ==================== ✅ ระบบนำทาง (state เดียว ใช้ callback) ====================
+NAV_OPTIONS = ["🏠 หน้าหลัก", "👤 ผู้พัฒนา"]
+
+def go_home():
+    st.session_state["nav_widget"] = NAV_OPTIONS[0]
+
+def go_dev():
+    st.session_state["nav_widget"] = NAV_OPTIONS[1]
+
+st.sidebar.markdown('<div class="hub-title">MACHINE LEARNING HUB</div>', unsafe_allow_html=True)
+st.sidebar.markdown('<hr class="hub-hr">', unsafe_allow_html=True)
+st.sidebar.markdown("### 📍 นำทาง")
+page = st.sidebar.selectbox("เลือกหน้า", NAV_OPTIONS, key="nav_widget")
+
+# ปุ่มลัดด้านบน (callback จะเปลี่ยนค่า selectbox ให้เอง)
+tb1, tb2, _ = st.columns([1.2, 1.2, 6])
+with tb1:
+    st.button("🏠 หน้าหลัก", use_container_width=True, key="top_home_btn", on_click=go_home)
+with tb2:
+    st.button("👤 ผู้พัฒนา", use_container_width=True, key="top_dev_btn", on_click=go_dev)
 
 EV = st.session_state.get("eval", None)
 
 # ================================================================
-#              หน้าหลัก (Home Page)
+#              หน้าหลัก
 # ================================================================
-if st.session_state.page == "home":
+if page == "🏠 หน้าหลัก":
     st.markdown('<span class="tag-cyber">MACHINE LEARNING PROJECT</span>', unsafe_allow_html=True)
     st.markdown('<div class="grad-title">ระบบตรวจจับธุรกรรมที่น่าสงสัย</div>', unsafe_allow_html=True)
     st.markdown('<div class="hazard-line"></div>', unsafe_allow_html=True)
@@ -292,9 +300,13 @@ if st.session_state.page == "home":
             st.subheader("🧹 2.1 ขั้นตอนการเตรียมข้อมูล")
             st.markdown("""
             1️⃣ **การสุ่มตัวอย่าง** — ลดขนาดจาก 284,807 เป็น 20,000 รายการ แบบ Stratified
+
             2️⃣ **การจัดการ Imbalance** — ใช้ SMOTE เพื่อเพิ่มจำนวน fraud samples ในชุดฝึก
+
             3️⃣ **การปรับมาตราส่วน** — ใช้ StandardScaler กับ Amount และ Time
+
             4️⃣ **การแบ่งข้อมูล** — Train/Test = 80:20 แบบ Stratified
+
             5️⃣ **การเลือกเมตริก** — เน้น Precision, Recall, F1-Score
             """)
 
@@ -320,14 +332,7 @@ if st.session_state.page == "home":
         if EV is None:
             with st.container(border=True):
                 st.info("⏳ ยังไม่มีผลการประเมิน — กดปุ่มเพื่อฝึกโมเดลและสร้างตาราง+กราฟอัตโนมัติ")
-                if st.button("🚀 เริ่มต้นฝึกโมเดลและประเมินผล", use_container_width=True, type="primary"):
-                    with st.spinner("⚙️ กำลังฝึก 4 โมเดล + สร้างกราฟประเมินผล..."):
-                        st.session_state["eval"] = build_and_eval()
-                    # ใช้ experimental_rerun เพื่อความเข้ากันได้กับ Streamlit Cloud ทุกเวอร์ชัน
-                    if hasattr(st, 'experimental_rerun'):
-                        st.experimental_rerun()
-                    else:
-                        st.rerun()
+                train_now("btn_train4")
         else:
             trained, scaler, comp, best_name, y_te, preds, probas = EV
             with st.container(border=True):
@@ -352,13 +357,7 @@ if st.session_state.page == "home":
             st.subheader("🔮 5.1 ทดลองตรวจจับธุรกรรม")
             if EV is None:
                 st.info("⏳ โมเดลยังไม่ถูกฝึก — กดปุ่มด้านล่างเพื่อเริ่มต้น")
-                if st.button("🚀 เริ่มต้นฝึกโมเดลและประเมินผล", use_container_width=True, type="primary", key="btn_train5"):
-                    with st.spinner("⚙️ กำลังฝึก 4 โมเดล + สร้างกราฟประเมินผล..."):
-                        st.session_state["eval"] = build_and_eval()
-                    if hasattr(st, 'experimental_rerun'):
-                        st.experimental_rerun()
-                    else:
-                        st.rerun()
+                train_now("btn_train5")
             else:
                 trained, scaler, comp, best_name, y_te, preds, probas = EV
                 best_idx = list(trained.keys()).index(best_name)
@@ -373,7 +372,7 @@ if st.session_state.page == "home":
                     v1 = st.number_input("🔢 V1 (PCA)", -50.0, 50.0, value=0.0)
                     v2 = st.number_input("🔢 V2 (PCA)", -50.0, 50.0, value=0.0)
 
-                if st.button("🔍 ตรวจจับธุรกรรม", use_container_width=True, type="primary"):
+                if st.button("🔍 ตรวจจับธุรกรรม", use_container_width=True):
                     inp_dict = {f"V{i}": 0.0 for i in range(1, 29)}
                     inp_dict["V1"] = float(v1); inp_dict["V2"] = float(v2)
                     scaled = scaler.transform(pd.DataFrame([[amount, time_val]], columns=["Amount", "Time"]))[0]
@@ -397,11 +396,12 @@ if st.session_state.page == "home":
     st.caption("📚 จัดทำเพื่อประกอบการเรียนวิชา Machine Learning • 🛠️ พัฒนาด้วย Python, scikit-learn, Streamlit")
 
 # ================================================================
-#              หน้าผู้พัฒนา (Developer Page)
+#      👤 หน้าผู้พัฒนา (กึ่งกลางสมบูรณ์ + รูปวงกลมชัวร์)
 # ================================================================
-elif st.session_state.page == "dev":
+else:
     st.markdown("""
     <style>
+    /* ✅ บังคับรูปวงกลมสมส่วนด้วย !important (กัน Streamlit ทับ) */
     img {
         display: block !important;
         margin: 0 auto !important;
@@ -456,6 +456,7 @@ elif st.session_state.page == "dev":
     </style>
     """, unsafe_allow_html=True)
 
+    # ✅ จัดทั้งหน้ากึ่งกลางด้วยคอลัมน์
     _, mid, _ = st.columns([1, 2.2, 1])
     with mid:
         st.markdown("""
@@ -465,6 +466,7 @@ elif st.session_state.page == "dev":
         </div>
         """, unsafe_allow_html=True)
 
+        # ✅ จัดรูปกึ่งกลางด้วยคอลัมน์ซ้อน (ชัวร์กว่า margin auto)
         if PHOTO:
             c1, c2, c3 = st.columns([1, 1.2, 1])
             with c2:
