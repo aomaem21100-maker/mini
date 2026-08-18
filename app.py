@@ -240,31 +240,33 @@ def train_now(key):
             st.session_state["eval"] = build_and_eval()
         st.rerun()
 
-# ==================== ✅ ระบบนำทาง (แบบเสถียร 100% ไม่ต้องใช้ st.rerun) ====================
-if "page" not in st.session_state:
-    st.session_state.page = "home"
+# ==================== ✅ ระบบนำทาง (แก้ไขแล้ว: เพิ่ม st.rerun()) ====================
+if "current_page" not in st.session_state:
+    st.session_state.current_page = "🏠 หน้าหลัก"
+
+def set_page(page_name):
+    st.session_state.current_page = page_name
+    st.rerun()  # ✅ คำสั่งนี้สำคัญมาก! ทำให้หน้าเว็บเปลี่ยนทันทีเมื่อกดปุ่ม
 
 with st.sidebar:
     st.markdown('<div class="hub-title">MACHINE LEARNING HUB</div>', unsafe_allow_html=True)
     st.markdown('<hr class="hub-hr">', unsafe_allow_html=True)
     st.markdown("### 📍 นำทาง")
     
-    # การใช้ if st.button() โดยตรง จะ trigger การ rerun ของ Streamlit โดยอัตโนมัติ
-    if st.button("🏠 หน้าหลัก", use_container_width=True):
-        st.session_state.page = "home"
-        
-    if st.button("👤 ผู้พัฒนา", use_container_width=True):
-        st.session_state.page = "dev"
-        
+    # ปุ่มนำทางใน Sidebar
+    st.button("🏠 หน้าหลัก", use_container_width=True, on_click=set_page, args=("🏠 หน้าหลัก",))
+    st.button("👤 ผู้พัฒนา", use_container_width=True, on_click=set_page, args=("👤 ผู้พัฒนา",))
+    
     st.markdown("---")
     st.caption("© 2568 • Machine Learning Hub")
 
+page = st.session_state.current_page
 EV = st.session_state.get("eval", None)
 
 # ================================================================
 #              หน้าหลัก
 # ================================================================
-if st.session_state.page == "home":
+if page == "🏠 หน้าหลัก":
     st.markdown('<span class="tag-cyber">MACHINE LEARNING PROJECT</span>', unsafe_allow_html=True)
     st.markdown('<div class="grad-title">ระบบตรวจจับธุรกรรมที่น่าสงสัย</div>', unsafe_allow_html=True)
     st.markdown('<div class="hazard-line"></div>', unsafe_allow_html=True)
@@ -396,11 +398,12 @@ if st.session_state.page == "home":
     st.caption("📚 จัดทำเพื่อประกอบการเรียนวิชา Machine Learning • 🛠️ พัฒนาด้วย Python, scikit-learn, Streamlit")
 
 # ================================================================
-#      👤 หน้าผู้พัฒนา
+#      👤 หน้าผู้พัฒนา (กึ่งกลางสมบูรณ์ + รูปวงกลมชัวร์)
 # ================================================================
-elif st.session_state.page == "dev":
+else:
     st.markdown("""
     <style>
+    /* ✅ บังคับรูปวงกลมสมส่วนด้วย !important (กัน Streamlit ทับ) */
     img {
         display: block !important;
         margin: 0 auto !important;
@@ -455,6 +458,7 @@ elif st.session_state.page == "dev":
     </style>
     """, unsafe_allow_html=True)
 
+    # ✅ จัดทั้งหน้ากึ่งกลางด้วยคอลัมน์
     _, mid, _ = st.columns([1, 2.2, 1])
     with mid:
         st.markdown("""
@@ -464,6 +468,7 @@ elif st.session_state.page == "dev":
         </div>
         """, unsafe_allow_html=True)
 
+        # ✅ จัดรูปกึ่งกลางด้วยคอลัมน์ซ้อน (ชัวร์กว่า margin auto)
         if PHOTO:
             c1, c2, c3 = st.columns([1, 1.2, 1])
             with c2:
