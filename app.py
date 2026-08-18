@@ -240,19 +240,20 @@ def train_now(key):
             st.session_state["eval"] = build_and_eval()
         st.rerun()
 
-# ==================== ✅ ระบบนำทาง (Sidebar เท่านั้น) ====================
+# ==================== ✅ ระบบนำทาง (แก้ไขแล้ว: เพิ่ม st.rerun()) ====================
 if "current_page" not in st.session_state:
     st.session_state.current_page = "🏠 หน้าหลัก"
 
 def set_page(page_name):
     st.session_state.current_page = page_name
+    st.rerun()  # ✅ คำสั่งนี้สำคัญมาก! ทำให้หน้าเว็บเปลี่ยนทันทีเมื่อกดปุ่ม
 
 with st.sidebar:
     st.markdown('<div class="hub-title">MACHINE LEARNING HUB</div>', unsafe_allow_html=True)
     st.markdown('<hr class="hub-hr">', unsafe_allow_html=True)
     st.markdown("### 📍 นำทาง")
     
-    # ปุ่มนำทางใน Sidebar (แทนที่ Selectbox และปุ่มด้านบน)
+    # ปุ่มนำทางใน Sidebar
     st.button("🏠 หน้าหลัก", use_container_width=True, on_click=set_page, args=("🏠 หน้าหลัก",))
     st.button("👤 ผู้พัฒนา", use_container_width=True, on_click=set_page, args=("👤 ผู้พัฒนา",))
     
