@@ -42,7 +42,6 @@ div[data-testid="stAppViewContainer"] > section.main {
 }
 #MainMenu, header, footer { visibility: hidden; }
 
-/* ===== Sidebar ===== */
 section[data-testid="stSidebar"] { background: #D4D2F2; border-right: 2px solid #6A3AB2; }
 section[data-testid="stSidebar"] p,
 section[data-testid="stSidebar"] span,
@@ -234,12 +233,6 @@ def make_figures(comp, y_te, preds, probas, best_name):
     fig_cm.colorbar(im, ax=ax, fraction=.046)
     return fig_bar, fig_roc, fig_cm
 
-def train_now(key):
-    if st.button("🚀 เริ่มต้นฝึกโมเดลและประเมินผล", use_container_width=True, key=key, type="primary"):
-        with st.spinner("⚙️ กำลังฝึก 4 โมเดล + สร้างกราฟประเมินผล..."):
-            st.session_state["eval"] = build_and_eval()
-        st.rerun()
-
 # ==================== ✅ ระบบนำทาง (Navigation) ====================
 if "page" not in st.session_state:
     st.session_state.page = "home"
@@ -249,7 +242,6 @@ with st.sidebar:
     st.markdown('<hr class="hub-hr">', unsafe_allow_html=True)
     st.markdown("### 📍 นำทาง")
     
-    # ปุ่มสลับหน้า (ทำงาน 100% โดยไม่ต้องใช้ callback หรือ st.rerun())
     if st.button("🏠 หน้าหลัก", use_container_width=True):
         st.session_state.page = "home"
         
@@ -300,13 +292,9 @@ if st.session_state.page == "home":
             st.subheader("🧹 2.1 ขั้นตอนการเตรียมข้อมูล")
             st.markdown("""
             1️⃣ **การสุ่มตัวอย่าง** — ลดขนาดจาก 284,807 เป็น 20,000 รายการ แบบ Stratified
-
             2️⃣ **การจัดการ Imbalance** — ใช้ SMOTE เพื่อเพิ่มจำนวน fraud samples ในชุดฝึก
-
             3️⃣ **การปรับมาตราส่วน** — ใช้ StandardScaler กับ Amount และ Time
-
             4️⃣ **การแบ่งข้อมูล** — Train/Test = 80:20 แบบ Stratified
-
             5️⃣ **การเลือกเมตริก** — เน้น Precision, Recall, F1-Score
             """)
 
@@ -332,7 +320,14 @@ if st.session_state.page == "home":
         if EV is None:
             with st.container(border=True):
                 st.info("⏳ ยังไม่มีผลการประเมิน — กดปุ่มเพื่อฝึกโมเดลและสร้างตาราง+กราฟอัตโนมัติ")
-                train_now("btn_train4")
+                if st.button("🚀 เริ่มต้นฝึกโมเดลและประเมินผล", use_container_width=True, type="primary"):
+                    with st.spinner("⚙️ กำลังฝึก 4 โมเดล + สร้างกราฟประเมินผล..."):
+                        st.session_state["eval"] = build_and_eval()
+                    # ใช้ experimental_rerun เพื่อความเข้ากันได้กับ Streamlit Cloud ทุกเวอร์ชัน
+                    if hasattr(st, 'experimental_rerun'):
+                        st.experimental_rerun()
+                    else:
+                        st.rerun()
         else:
             trained, scaler, comp, best_name, y_te, preds, probas = EV
             with st.container(border=True):
@@ -357,7 +352,13 @@ if st.session_state.page == "home":
             st.subheader("🔮 5.1 ทดลองตรวจจับธุรกรรม")
             if EV is None:
                 st.info("⏳ โมเดลยังไม่ถูกฝึก — กดปุ่มด้านล่างเพื่อเริ่มต้น")
-                train_now("btn_train5")
+                if st.button("🚀 เริ่มต้นฝึกโมเดลและประเมินผล", use_container_width=True, type="primary", key="btn_train5"):
+                    with st.spinner("⚙️ กำลังฝึก 4 โมเดล + สร้างกราฟประเมินผล..."):
+                        st.session_state["eval"] = build_and_eval()
+                    if hasattr(st, 'experimental_rerun'):
+                        st.experimental_rerun()
+                    else:
+                        st.rerun()
             else:
                 trained, scaler, comp, best_name, y_te, preds, probas = EV
                 best_idx = list(trained.keys()).index(best_name)
