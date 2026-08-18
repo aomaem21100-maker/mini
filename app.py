@@ -240,7 +240,7 @@ def train_now(key):
             st.session_state["eval"] = build_and_eval()
         st.rerun()
 
-# ==================== ✅ ระบบนำทาง (แบบเสถียร 100% ไม่ต้องใช้ st.rerun) ====================
+# ==================== ✅ ระบบนำทาง (Navigation) ====================
 if "page" not in st.session_state:
     st.session_state.page = "home"
 
@@ -249,7 +249,7 @@ with st.sidebar:
     st.markdown('<hr class="hub-hr">', unsafe_allow_html=True)
     st.markdown("### 📍 นำทาง")
     
-    # การใช้ if st.button() โดยตรง จะ trigger การ rerun ของ Streamlit โดยอัตโนมัติ
+    # ปุ่มสลับหน้า (ทำงาน 100% โดยไม่ต้องใช้ callback หรือ st.rerun())
     if st.button("🏠 หน้าหลัก", use_container_width=True):
         st.session_state.page = "home"
         
@@ -262,7 +262,7 @@ with st.sidebar:
 EV = st.session_state.get("eval", None)
 
 # ================================================================
-#              หน้าหลัก
+#              หน้าหลัก (Home Page)
 # ================================================================
 if st.session_state.page == "home":
     st.markdown('<span class="tag-cyber">MACHINE LEARNING PROJECT</span>', unsafe_allow_html=True)
@@ -396,7 +396,7 @@ if st.session_state.page == "home":
     st.caption("📚 จัดทำเพื่อประกอบการเรียนวิชา Machine Learning • 🛠️ พัฒนาด้วย Python, scikit-learn, Streamlit")
 
 # ================================================================
-#      👤 หน้าผู้พัฒนา
+#              หน้าผู้พัฒนา (Developer Page)
 # ================================================================
 elif st.session_state.page == "dev":
     st.markdown("""
