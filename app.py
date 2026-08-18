@@ -214,7 +214,7 @@ def make_figures(comp, y_te, preds, probas, best_name):
     fig_roc, ax = plt.subplots(figsize=(7, 5))
     for i, (name, pr) in enumerate(probas.items()):
         fpr, tpr, _ = roc_curve(y_te, pr)
-        ax.plot(fpr, tpr, color=EVA_COLORS[i], label=name)แก้มาใหเลย
+        ax.plot(fpr, tpr, color=EVA_COLORS[i], label=name)
     ax.plot([0, 1], [0, 1], "--", color="#93A1B8", alpha=.6)
     ax.set_title("ROC Curve"); ax.set_xlabel("FPR"); ax.set_ylabel("TPR")
     ax.legend(loc="lower right")
