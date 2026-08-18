@@ -59,17 +59,19 @@ section[data-testid="stSidebar"] label { color: #1A1A2E; }
     background: repeating-linear-gradient(45deg, #FF7A00 0 10px, #14141E 10px 20px);
 }
 
-section[data-testid="stSidebar"] .stSelectbox { margin-top: 1rem; }
-section[data-testid="stSidebar"] .stSelectbox > div {
+section[data-testid="stSidebar"] .stButton > button {
     background: #FFFFFF !important;
     border: 2px solid #6A3AB2 !important;
     border-radius: 10px;
     padding: 0.8rem 1rem;
     font-size: 1rem; font-weight: 600; color: #1A1A2E !important;
+    margin-bottom: 0.5rem;
+    transition: all 0.2s ease;
 }
-section[data-testid="stSidebar"] .stSelectbox > div:hover {
+section[data-testid="stSidebar"] .stButton > button:hover {
     border-color: #39FF14 !important;
     box-shadow: 0 0 12px rgba(57, 255, 20, 0.3);
+    color: #6A3AB2 !important;
 }
 
 html, body, [class*="css"] { font-family: 'IBM Plex Sans Thai', 'Inter', sans-serif; }
@@ -121,6 +123,12 @@ div.stButton > button {
     box-shadow: 0 0 14px rgba(57,255,20,.35); transition: all .2s ease;
 }
 div.stButton > button:hover { background: #52FF33; box-shadow: 0 0 22px rgba(57,255,20,.55); }
+div.stButton > button[kind="secondary"] {
+    background: transparent; color: #39FF14; border: 1px solid #39FF14;
+}
+div.stButton > button[kind="secondary"]:hover {
+    background: rgba(57,255,20,0.1);
+}
 
 input, textarea {
     background: #212B3B !important; border: 1px solid #3A465C !important;
@@ -171,7 +179,20 @@ def make_data(n=20000, seed=42):
     data = {col: np.random.randn(n) for col in pca_cols}
     data["Time"] = np.random.uniform(0, 172792, n)
     data["Amount"] = np.random.exponential(88, n)
-    data["Class"] = np.random.choice([0, 1], n, p=[0.9983, 0.0017])
+    
+    # ✅ เพิ่มสัญญาณ (Signal) ให้โมเดลเรียนรู้ได้จริง (Fraud ~1.7%)
+    n_fraud = int(n * 0.017)
+    fraud_idx = np.random.choice(n, size=n_fraud, replace=False)
+    
+    data["Class"] = np.zeros(n)
+    data["Class"][fraud_idx] = 1
+    
+    # Inject realistic patterns for fraud
+    data["Amount"][fraud_idx] = np.random.exponential(300, n_fraud)      # Fraud มักมีมูลค่าสูง
+    data["V1"][fraud_idx] = np.random.normal(-2, 1.5, n_fraud)           # การกระจายตัวที่เปลี่ยนไป
+    data["V2"][fraud_idx] = np.random.normal(2, 1.5, n_fraud)
+    data["Time"][fraud_idx] = np.random.uniform(0, 50000, n_fraud)       # มักเกิดในช่วงเวลาเฉพาะ
+    
     return pd.DataFrame(data)
 
 @st.cache_resource
@@ -208,7 +229,7 @@ def make_figures(comp, y_te, preds, probas, best_name):
     x = np.arange(len(comp)); w = .2
     for i, col in enumerate(["Accuracy", "Precision", "Recall", "F1"]):
         ax.bar(x + i*w - 1.5*w, comp[col], w, label=col, color=EVA_COLORS[i])
-    ax.set_xticks(x); ax.set_xticklabels(comp["Model"], rotation=8)
+    ax.set_xticks(x, labels=comp["Model"], rotation=8) # ✅ แก้ไข Deprecation Warning
     ax.set_ylim(0, 1); ax.legend(); ax.set_title("Model Comparison"); ax.grid(axis="y", alpha=.3)
 
     fig_roc, ax = plt.subplots(figsize=(7, 5))
@@ -222,8 +243,8 @@ def make_figures(comp, y_te, preds, probas, best_name):
     cm = confusion_matrix(y_te, preds[best_name])
     fig_cm, ax = plt.subplots(figsize=(5.5, 4.5))
     im = ax.imshow(cm, cmap="Greens")
-    ax.set_xticks([0, 1]); ax.set_yticks([0, 1])
-    ax.set_xticklabels(["Normal", "Fraud"]); ax.set_yticklabels(["Normal", "Fraud"])
+    ax.set_xticks([0, 1], labels=["Normal", "Fraud"])
+    ax.set_yticks([0, 1], labels=["Normal", "Fraud"])
     for ii in range(2):
         for jj in range(2):
             ax.text(jj, ii, f"{cm[ii, jj]:,}", ha="center", va="center",
@@ -233,32 +254,29 @@ def make_figures(comp, y_te, preds, probas, best_name):
     return fig_bar, fig_roc, fig_cm
 
 def train_now(key):
-    if st.button("🚀 เริ่มต้นฝึกโมเดลและประเมินผล", use_container_width=True, key=key):
+    if st.button("🚀 เริ่มต้นฝึกโมเดลและประเมินผล", use_container_width=True, key=key, type="primary"):
         with st.spinner("⚙️ กำลังฝึก 4 โมเดล + สร้างกราฟประเมินผล..."):
             st.session_state["eval"] = build_and_eval()
         st.rerun()
 
-# ==================== ✅ ระบบนำทาง (state เดียว ใช้ callback) ====================
+# ==================== ✅ ระบบนำทาง (State Management) ====================
 NAV_OPTIONS = ["🏠 หน้าหลัก", "👤 ผู้พัฒนา"]
+if "nav_page" not in st.session_state:
+    st.session_state.nav_page = NAV_OPTIONS[0]
 
-def go_home():
-    st.session_state["nav_widget"] = NAV_OPTIONS[0]
+def set_page(page):
+    st.session_state.nav_page = page
 
-def go_dev():
-    st.session_state["nav_widget"] = NAV_OPTIONS[1]
+with st.sidebar:
+    st.markdown('<div class="hub-title">MACHINE LEARNING HUB</div>', unsafe_allow_html=True)
+    st.markdown('<hr class="hub-hr">', unsafe_allow_html=True)
+    st.markdown("### 📍 นำทาง")
+    st.button("🏠 หน้าหลัก", use_container_width=True, on_click=set_page, args=("🏠 หน้าหลัก",))
+    st.button("👤 ผู้พัฒนา", use_container_width=True, on_click=set_page, args=("👤 ผู้พัฒนา",))
+    st.markdown("---")
+    st.caption("© 2568 • Machine Learning Hub")
 
-st.sidebar.markdown('<div class="hub-title">MACHINE LEARNING HUB</div>', unsafe_allow_html=True)
-st.sidebar.markdown('<hr class="hub-hr">', unsafe_allow_html=True)
-st.sidebar.markdown("### 📍 นำทาง")
-page = st.sidebar.selectbox("เลือกหน้า", NAV_OPTIONS, key="nav_widget")
-
-# ปุ่มลัดด้านบน (callback จะเปลี่ยนค่า selectbox ให้เอง)
-tb1, tb2, _ = st.columns([1.2, 1.2, 6])
-with tb1:
-    st.button("🏠 หน้าหลัก", use_container_width=True, key="top_home_btn", on_click=go_home)
-with tb2:
-    st.button("👤 ผู้พัฒนา", use_container_width=True, key="top_dev_btn", on_click=go_dev)
-
+page = st.session_state.nav_page
 EV = st.session_state.get("eval", None)
 
 # ================================================================
@@ -339,6 +357,17 @@ if page == "🏠 หน้าหลัก":
                 st.subheader("📊 4.1 ตารางเปรียบเทียบประสิทธิภาพ")
                 st.dataframe(comp.round(4), use_container_width=True, hide_index=True)
                 st.caption(f"🏆 โมเดลที่ดีที่สุดตาม F1-Score: **{best_name}**")
+                
+                # ✅ เพิ่มปุ่มดาวน์โหลด
+                csv = comp.to_csv(index=False).encode('utf-8')
+                st.download_button(
+                    label="📥 ดาวน์โหลดตารางเปรียบเทียบ (CSV)",
+                    data=csv,
+                    file_name='model_evaluation_report.csv',
+                    mime='text/csv',
+                    use_container_width=True
+                )
+                
             fig_bar, fig_roc, fig_cm = make_figures(comp, y_te, preds, probas, best_name)
             st.subheader("📈 4.2 กราฟเปรียบเทียบโมเดล")
             st.pyplot(fig_bar)
@@ -363,45 +392,87 @@ if page == "🏠 หน้าหลัก":
                 best_idx = list(trained.keys()).index(best_name)
                 model_name = st.selectbox("🎛️ เลือกโมเดล", list(trained.keys()), index=best_idx)
 
-                st.markdown("**📝 กรอกข้อมูลธุรกรรม**")
+                st.markdown("**📝 กรอกข้อมูลธุรกรรม (หรือใช้ปุ่มสุ่มด้านล่าง)**")
+                
+                # ✅ ฟังก์ชันสุ่มข้อมูลสำหรับ Demo
+                def set_demo(is_fraud):
+                    if is_fraud:
+                        st.session_state["inp_time"] = float(np.random.uniform(0, 50000))
+                        st.session_state["inp_amount"] = float(np.random.exponential(300))
+                        st.session_state["inp_v1"] = float(np.random.normal(-2, 1.5))
+                        st.session_state["inp_v2"] = float(np.random.normal(2, 1.5))
+                    else:
+                        st.session_state["inp_time"] = float(np.random.uniform(50000, 150000))
+                        st.session_state["inp_amount"] = float(np.random.exponential(88))
+                        st.session_state["inp_v1"] = float(np.random.normal(0, 1))
+                        st.session_state["inp_v2"] = float(np.random.normal(0, 1))
+                    st.rerun()
+
+                if "inp_time" not in st.session_state:
+                    set_demo(False)
+
+                col_sim1, col_sim2 = st.columns(2)
+                with col_sim1:
+                    st.button("🟢 สุ่มข้อมูลปกติ (Demo)", on_click=set_demo, args=(False,), use_container_width=True)
+                with col_sim2:
+                    st.button("🔴 สุ่มข้อมูลทุจริต (Demo)", on_click=set_demo, args=(True,), use_container_width=True)
+
                 c1, c2 = st.columns(2)
                 with c1:
-                    time_val = st.number_input("⏱️ Time (วินาที)", 0.0, 200000.0, value=50000.0)
-                    amount = st.number_input("💰 Amount (USD)", 0.0, 50000.0, value=100.0)
+                    time_val = st.number_input("⏱️ Time (วินาที)", 0.0, 200000.0, value=st.session_state.inp_time, key="inp_time")
+                    amount = st.number_input("💰 Amount (USD)", 0.0, 50000.0, value=st.session_state.inp_amount, key="inp_amount")
                 with c2:
-                    v1 = st.number_input("🔢 V1 (PCA)", -50.0, 50.0, value=0.0)
-                    v2 = st.number_input("🔢 V2 (PCA)", -50.0, 50.0, value=0.0)
+                    v1 = st.number_input("🔢 V1 (PCA)", -50.0, 50.0, value=st.session_state.inp_v1, key="inp_v1")
+                    v2 = st.number_input("🔢 V2 (PCA)", -50.0, 50.0, value=st.session_state.inp_v2, key="inp_v2")
 
-                if st.button("🔍 ตรวจจับธุรกรรม", use_container_width=True):
-                    inp_dict = {f"V{i}": 0.0 for i in range(1, 29)}
-                    inp_dict["V1"] = float(v1); inp_dict["V2"] = float(v2)
-                    scaled = scaler.transform(pd.DataFrame([[amount, time_val]], columns=["Amount", "Time"]))[0]
-                    inp_dict["Amount"] = float(scaled[0]); inp_dict["Time"] = float(scaled[1])
-                    train_columns = [f"V{i}" for i in range(1, 29)] + ["Time", "Amount"]
-                    inp = pd.DataFrame([inp_dict])[train_columns]
+                if st.button("🔍 ตรวจจับธุรกรรม", use_container_width=True, type="primary"):
+                    with st.spinner("⚙️ กำลังวิเคราะห์ธุรกรรม..."):
+                        # ✅ สุ่มค่า V3-V28 เพื่อป้องกัน artefact จากค่าศูนย์ทั้งหมด
+                        inp_dict = {f"V{i}": float(np.random.randn()) for i in range(3, 29)}
+                        inp_dict["V1"] = float(v1)
+                        inp_dict["V2"] = float(v2)
+                        
+                        scaled = scaler.transform(pd.DataFrame([[amount, time_val]], columns=["Amount", "Time"]))[0]
+                        inp_dict["Amount"] = float(scaled[0])
+                        inp_dict["Time"] = float(scaled[1])
+                        
+                        train_columns = [f"V{i}" for i in range(1, 29)] + ["Time", "Amount"]
+                        inp = pd.DataFrame([inp_dict])[train_columns]
 
-                    m = trained[model_name]
-                    pred = m.predict(inp)[0]
-                    proba = m.predict_proba(inp)[0][1]
+                        m = trained[model_name]
+                        pred = int(m.predict(inp)[0])
+                        proba = float(m.predict_proba(inp)[0][1])
 
-                    st.markdown("---")
-                    if pred == 1:
-                        st.error(f"🚨 **ผลการตรวจจับ:** ธุรกรรมน่าสงสัย (Fraud)")
-                    else:
-                        st.success(f"✅ **ผลการตรวจจับ:** ธุรกรรมปกติ (Normal)")
-                    st.write(f"🎯 ความน่าจะเป็น fraud: **{proba:.1%}**")
-                    st.progress(float(proba))
+                        st.markdown("---")
+                        if pred == 1:
+                            st.error(f"🚨 **ผลการตรวจจับ:** ธุรกรรมน่าสงสัย (Fraud)")
+                        else:
+                            st.success(f"✅ **ผลการตรวจจับ:** ธุรกรรมปกติ (Normal)")
+                        
+                        # ✅ เพิ่มการประเมินระดับความเสี่ยง
+                        if proba > 0.75:
+                            risk_text = "สูงมาก (High Risk)"
+                            risk_color = "#FF4444"
+                        elif proba > 0.4:
+                            risk_text = "ปานกลาง (Medium Risk)"
+                            risk_color = "#FFAA00"
+                        else:
+                            risk_text = "ต่ำ (Low Risk)"
+                            risk_color = "#39FF14"
+
+                        st.markdown(f"🎯 ความน่าจะเป็น Fraud: **<span style='color:{risk_color}'>{proba:.1%}</span>**", unsafe_allow_html=True)
+                        st.markdown(f"🛡️ ระดับความเสี่ยง: **{risk_text}**")
+                        st.progress(proba, text=f"{proba:.1%}")
 
     st.markdown("---")
     st.caption("📚 จัดทำเพื่อประกอบการเรียนวิชา Machine Learning • 🛠️ พัฒนาด้วย Python, scikit-learn, Streamlit")
 
 # ================================================================
-#      👤 หน้าผู้พัฒนา (กึ่งกลางสมบูรณ์ + รูปวงกลมชัวร์)
+#      👤 หน้าผู้พัฒนา
 # ================================================================
 else:
     st.markdown("""
     <style>
-    /* ✅ บังคับรูปวงกลมสมส่วนด้วย !important (กัน Streamlit ทับ) */
     img {
         display: block !important;
         margin: 0 auto !important;
@@ -456,7 +527,6 @@ else:
     </style>
     """, unsafe_allow_html=True)
 
-    # ✅ จัดทั้งหน้ากึ่งกลางด้วยคอลัมน์
     _, mid, _ = st.columns([1, 2.2, 1])
     with mid:
         st.markdown("""
@@ -466,7 +536,6 @@ else:
         </div>
         """, unsafe_allow_html=True)
 
-        # ✅ จัดรูปกึ่งกลางด้วยคอลัมน์ซ้อน (ชัวร์กว่า margin auto)
         if PHOTO:
             c1, c2, c3 = st.columns([1, 1.2, 1])
             with c2:
