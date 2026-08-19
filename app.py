@@ -2,23 +2,21 @@ import os
 import streamlit as st
 import pandas as pd
 import numpy as np
-
 import matplotlib
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt 
 
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import (accuracy_score, precision_score, recall_score,
-                             f1_score, roc_curve, confusion_matrix)
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_curve, confusion_matrix
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from imblearn.over_sampling import SMOTE
+import datetime
 
-st.set_page_config(page_title="Machine Learning Hub", page_icon="🤖",
-                   layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="Machine Learning Hub", page_icon="🤖", layout="wide", initial_sidebar_state="expanded")
 
 plt.rcParams.update({
     "figure.facecolor": "#212B3B", "axes.facecolor": "#212B3B",
@@ -35,18 +33,13 @@ st.markdown("""
 
 div[data-testid="stAppViewContainer"] > section.main {
     background-color: #293242;
-    background-image:
-        linear-gradient(rgba(57,255,20,0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(57,255,20,0.05) 1px, transparent 1px);
+    background-image: linear-gradient(rgba(57,255,20,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(57,255,20,0.05) 1px, transparent 1px);
     background-size: 42px 42px;
 }
 #MainMenu, header, footer { visibility: hidden; }
 
-/* ===== Sidebar ===== */
 section[data-testid="stSidebar"] { background: #D4D2F2; border-right: 2px solid #6A3AB2; }
-section[data-testid="stSidebar"] p,
-section[data-testid="stSidebar"] span,
-section[data-testid="stSidebar"] label { color: #1A1A2E; }
+section[data-testid="stSidebar"] p, section[data-testid="stSidebar"] span, section[data-testid="stSidebar"] label { color: #1A1A2E; }
 
 .hub-title {
     font-family: 'Orbitron', 'IBM Plex Sans Thai', sans-serif;
@@ -59,17 +52,12 @@ section[data-testid="stSidebar"] label { color: #1A1A2E; }
     background: repeating-linear-gradient(45deg, #FF7A00 0 10px, #14141E 10px 20px);
 }
 
-section[data-testid="stSidebar"] .stSelectbox { margin-top: 1rem; }
 section[data-testid="stSidebar"] .stSelectbox > div {
-    background: #FFFFFF !important;
-    border: 2px solid #6A3AB2 !important;
-    border-radius: 10px;
-    padding: 0.8rem 1rem;
-    font-size: 1rem; font-weight: 600; color: #1A1A2E !important;
+    background: #FFFFFF !important; border: 2px solid #6A3AB2 !important;
+    border-radius: 10px; padding: 0.8rem 1rem; font-size: 1rem; font-weight: 600; color: #1A1A2E !important;
 }
 section[data-testid="stSidebar"] .stSelectbox > div:hover {
-    border-color: #39FF14 !important;
-    box-shadow: 0 0 12px rgba(57, 255, 20, 0.3);
+    border-color: #39FF14 !important; box-shadow: 0 0 12px rgba(57, 255, 20, 0.3);
 }
 
 html, body, [class*="css"] { font-family: 'IBM Plex Sans Thai', 'Inter', sans-serif; }
@@ -144,6 +132,18 @@ img { border-radius: 10px; border: 1px solid #3A465C; }
     height: 4px; border-radius: 2px; margin: .5rem 0 1rem 0;
     background: repeating-linear-gradient(45deg, #FF7A00 0 12px, #14141E 12px 24px);
 }
+
+/* 🌟 ลูกเล่นใหม่: Risk Badges & History */
+.risk-badge {
+    display: inline-block; padding: 0.4rem 1rem; border-radius: 6px;
+    font-family: 'Orbitron', sans-serif; font-weight: 700; letter-spacing: 1px;
+}
+.risk-low { background: rgba(57, 255, 20, 0.15); color: #39FF14; border: 1px solid #39FF14; }
+.risk-med { background: rgba(255, 122, 0, 0.15); color: #FF7A00; border: 1px solid #FF7A00; }
+.risk-high { background: rgba(255, 50, 50, 0.15); color: #FF3232; border: 1px solid #FF3232; box-shadow: 0 0 15px rgba(255, 50, 50, 0.3); }
+
+.history-table th { color: #39FF14 !important; font-family: 'Orbitron', sans-serif; font-size: 0.8rem; }
+.history-table td { color: #D5DCEA !important; font-size: 0.85rem; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -238,7 +238,7 @@ def train_now(key):
             st.session_state["eval"] = build_and_eval()
         st.rerun()
 
-# ==================== ✅ ระบบนำทาง (state เดียว ใช้ callback) ====================
+# ==================== ✅ ระบบนำทาง ====================
 NAV_OPTIONS = ["🏠 หน้าหลัก", "👤 ผู้พัฒนา"]
 
 def go_home():
@@ -252,7 +252,6 @@ st.sidebar.markdown('<hr class="hub-hr">', unsafe_allow_html=True)
 st.sidebar.markdown("### 📍 นำทาง")
 page = st.sidebar.selectbox("เลือกหน้า", NAV_OPTIONS, key="nav_widget")
 
-# ปุ่มลัดด้านบน (callback จะเปลี่ยนค่า selectbox ให้เอง)
 tb1, tb2, _ = st.columns([1.2, 1.2, 6])
 with tb1:
     st.button("🏠 หน้าหลัก", use_container_width=True, key="top_home_btn", on_click=go_home)
@@ -300,13 +299,9 @@ if page == "🏠 หน้าหลัก":
             st.subheader("🧹 2.1 ขั้นตอนการเตรียมข้อมูล")
             st.markdown("""
             1️⃣ **การสุ่มตัวอย่าง** — ลดขนาดจาก 284,807 เป็น 20,000 รายการ แบบ Stratified
-
             2️⃣ **การจัดการ Imbalance** — ใช้ SMOTE เพื่อเพิ่มจำนวน fraud samples ในชุดฝึก
-
             3️⃣ **การปรับมาตราส่วน** — ใช้ StandardScaler กับ Amount และ Time
-
             4️⃣ **การแบ่งข้อมูล** — Train/Test = 80:20 แบบ Stratified
-
             5️⃣ **การเลือกเมตริก** — เน้น Precision, Recall, F1-Score
             """)
 
@@ -352,27 +347,74 @@ if page == "🏠 หน้าหลัก":
                     st.pyplot(fig_cm)
                     st.caption(f"🎯 ภาพที่ 3: Confusion Matrix ของ {best_name}")
 
+    # ================================================================
+    # 🔮 แท็บ 5: ทดลองตรวจจับ (อัปเกรดเต็มรูปแบบ)
+    # ================================================================
     with t5:
         with st.container(border=True):
             st.subheader("🔮 5.1 ทดลองตรวจจับธุรกรรม")
+            
             if EV is None:
                 st.info("⏳ โมเดลยังไม่ถูกฝึก — กดปุ่มด้านล่างเพื่อเริ่มต้น")
                 train_now("btn_train5")
             else:
+                # Initialize Session State for History & Inputs
+                if "tx_history" not in st.session_state:
+                    st.session_state.tx_history = []
+                if "inp_time" not in st.session_state: st.session_state.inp_time = 50000.0
+                if "inp_amount" not in st.session_state: st.session_state.inp_amount = 100.0
+                if "inp_v1" not in st.session_state: st.session_state.inp_v1 = 0.0
+                if "inp_v2" not in st.session_state: st.session_state.inp_v2 = 0.0
+
                 trained, scaler, comp, best_name, y_te, preds, probas = EV
                 best_idx = list(trained.keys()).index(best_name)
                 model_name = st.selectbox("🎛️ เลือกโมเดล", list(trained.keys()), index=best_idx)
 
                 st.markdown("**📝 กรอกข้อมูลธุรกรรม**")
+                
+                # 🎲 ลูกเล่น 1: Preset Examples
+                st.markdown("<small style='color:#93A1B8'>⚡ โหลดข้อมูลตัวอย่างด่วน:</small>", unsafe_allow_html=True)
+                pc1, pc2, pc3 = st.columns(3)
+                with pc1:
+                    if st.button("✅ ตัวอย่าง Normal", use_container_width=True):
+                        st.session_state.inp_time = float(np.random.uniform(10000, 150000))
+                        st.session_state.inp_amount = float(np.random.exponential(50))
+                        st.session_state.inp_v1 = float(np.random.normal(0, 1))
+                        st.session_state.inp_v2 = float(np.random.normal(0, 1))
+                        st.rerun()
+                with pc2:
+                    if st.button("🚨 ตัวอย่าง Fraud", use_container_width=True):
+                        st.session_state.inp_time = float(np.random.uniform(0, 5000))
+                        st.session_state.inp_amount = float(np.random.exponential(500) + 500) # High amount
+                        st.session_state.inp_v1 = float(np.random.normal(-3, 1.5)) # Extreme V1
+                        st.session_state.inp_v2 = float(np.random.normal(2.5, 1.5))
+                        st.rerun()
+                with pc3:
+                    if st.button("🎲 สุ่มข้อมูลใหม่", use_container_width=True):
+                        st.session_state.inp_time = float(np.random.uniform(0, 172792))
+                        st.session_state.inp_amount = float(np.random.exponential(88))
+                        st.session_state.inp_v1 = float(np.random.randn())
+                        st.session_state.inp_v2 = float(np.random.randn())
+                        st.rerun()
+
+                st.markdown("<br>", unsafe_allow_html=True)
+
                 c1, c2 = st.columns(2)
                 with c1:
-                    time_val = st.number_input("⏱️ Time (วินาที)", 0.0, 200000.0, value=50000.0)
-                    amount = st.number_input("💰 Amount (USD)", 0.0, 50000.0, value=100.0)
+                    time_val = st.number_input("⏱️ Time (วินาที)", 0.0, 200000.0, value=st.session_state.inp_time, key="ni_time")
+                    amount = st.number_input("💰 Amount (USD)", 0.0, 50000.0, value=st.session_state.inp_amount, key="ni_amount")
                 with c2:
-                    v1 = st.number_input("🔢 V1 (PCA)", -50.0, 50.0, value=0.0)
-                    v2 = st.number_input("🔢 V2 (PCA)", -50.0, 50.0, value=0.0)
+                    v1 = st.number_input("🔢 V1 (PCA)", -50.0, 50.0, value=st.session_state.inp_v1, key="ni_v1")
+                    v2 = st.number_input("🔢 V2 (PCA)", -50.0, 50.0, value=st.session_state.inp_v2, key="ni_v2")
 
-                if st.button("🔍 ตรวจจับธุรกรรม", use_container_width=True):
+                if st.button("🔍 ตรวจจับธุรกรรม", use_container_width=True, type="primary"):
+                    # Update session state with current inputs
+                    st.session_state.inp_time = float(time_val)
+                    st.session_state.inp_amount = float(amount)
+                    st.session_state.inp_v1 = float(v1)
+                    st.session_state.inp_v2 = float(v2)
+
+                    # Prepare input
                     inp_dict = {f"V{i}": 0.0 for i in range(1, 29)}
                     inp_dict["V1"] = float(v1); inp_dict["V2"] = float(v2)
                     scaled = scaler.transform(pd.DataFrame([[amount, time_val]], columns=["Amount", "Time"]))[0]
@@ -381,45 +423,98 @@ if page == "🏠 หน้าหลัก":
                     inp = pd.DataFrame([inp_dict])[train_columns]
 
                     m = trained[model_name]
-                    pred = m.predict(inp)[0]
-                    proba = m.predict_proba(inp)[0][1]
+                    pred = int(m.predict(inp)[0])
+                    proba = float(m.predict_proba(inp)[0][1])
+
+                    # 🧠 ลูกเล่น 3: AI Explanation (Rule-based mock for demo)
+                    reasons = []
+                    if amount > 300: reasons.append("💰 จำนวนเงินสูงกว่าค่าเฉลี่ยทั่วไป (>300 USD)")
+                    if abs(v1) > 2.5: reasons.append("📉 ค่า V1 มีความเบี่ยงเบนสูงผิดปกติ (Extreme Value)")
+                    if abs(v2) > 2.5: reasons.append("📈 ค่า V2 มีความเบี่ยงเบนสูงผิดปกติ (Extreme Value)")
+                    if time_val < 10000: reasons.append("⏱️ เกิดธุรกรรมในช่วงเวลาเริ่มต้นที่มักมีการโจมตี")
+                    if not reasons: reasons.append("✅ รูปแบบข้อมูลอยู่ในเกณฑ์ปกติ ไม่พบความผิดปกติชัดเจนในฟีเจอร์หลัก")
+
+                    # 📜 ลูกเล่น 4: Add to History
+                    new_record = {
+                        "เวลา": datetime.datetime.now().strftime("%H:%M:%S"),
+                        "โมเดล": model_name,
+                        "Amount": f"${amount:,.2f}",
+                        "ผล": "🚨 FRAUD" if pred == 1 else "✅ NORMAL",
+                        "ความน่าจะเป็น": f"{proba:.1%}"
+                    }
+                    st.session_state.tx_history.insert(0, new_record)
+                    if len(st.session_state.tx_history) > 10:
+                        st.session_state.tx_history.pop()
 
                     st.markdown("---")
-                    if pred == 1:
-                        st.error(f"🚨 **ผลการตรวจจับ:** ธุรกรรมน่าสงสัย (Fraud)")
+                    
+                    # ⚡ ลูกเล่น 2: Enhanced Visual Feedback
+                    res_col1, res_col2 = st.columns([1, 2])
+                    with res_col1:
+                        if pred == 1:
+                            st.markdown(f'<div class="risk-badge risk-high">🚨 FRAUD DETECTED</div>', unsafe_allow_html=True)
+                            bar_color = "#FF3232"
+                        else:
+                            st.markdown(f'<div class="risk-badge risk-low">✅ NORMAL TRANSACTION</div>', unsafe_allow_html=True)
+                            bar_color = "#39FF14"
+                        
+                        st.markdown(f"<p style='text-align:center; margin-top:10px; color:#93A1B8; font-size:0.9rem;'>ความน่าจะเป็นที่จะเป็น Fraud</p>", unsafe_allow_html=True)
+                        st.markdown(f"<h2 style='text-align:center; color:{bar_color}; margin-top:-10px;'>{proba:.1%}</h2>", unsafe_allow_html=True)
+                        
+                        # Custom colored progress bar using HTML/CSS since st.progress color is limited
+                        st.markdown(f"""
+                        <div style="background:#1A2230; border-radius:10px; height:12px; width:100%; overflow:hidden; border:1px solid #3A465C;">
+                            <div style="background: linear-gradient(90deg, {bar_color}, #6A3AB2); height:100%; width:{proba*100}%; border-radius:10px; box-shadow: 0 0 10px {bar_color}; transition: width 1s ease-in-out;"></div>
+                        </div>
+                        """, unsafe_allow_html=True)
+
+                    with res_col2:
+                        st.markdown("**🧠 AI Analysis (เหตุผลประกอบการตัดสินใจ)**")
+                        for reason in reasons:
+                            st.markdown(f"- {reason}")
+                        
+                        st.markdown("<br>", unsafe_allow_html=True)
+                        st.markdown(f"<small style='color:#6A3AB2'>🔒 หมายเหตุ: การตัดสินใจโดยโมเดล **{model_name}** อาจมีความคลาดเคลื่อน ควรใช้ประกอบการพิจารณาของมนุษย์</small>", unsafe_allow_html=True)
+
+                # 📜 Display History Log
+                st.markdown("<br>", unsafe_allow_html=True)
+                with st.expander("📜 ประวัติการทดสอบล่าสุด (Session)", expanded=True):
+                    if len(st.session_state.tx_history) > 0:
+                        hist_df = pd.DataFrame(st.session_state.tx_history)
+                        # Style the dataframe
+                        st.dataframe(
+                            hist_df, 
+                            use_container_width=True, 
+                            hide_index=True,
+                            column_config={
+                                "เวลา": st.column_config.TextColumn(width="small"),
+                                "โมเดล": st.column_config.TextColumn(width="medium"),
+                                "ผล": st.column_config.TextColumn(width="small"),
+                            }
+                        )
+                        if st.button("🗑️ ล้างประวัติ", key="clear_hist"):
+                            st.session_state.tx_history = []
+                            st.rerun()
                     else:
-                        st.success(f"✅ **ผลการตรวจจับ:** ธุรกรรมปกติ (Normal)")
-                    st.write(f"🎯 ความน่าจะเป็น fraud: **{proba:.1%}**")
-                    st.progress(float(proba))
+                        st.caption("ยังไม่มีประวัติการทดสอบ")
 
     st.markdown("---")
     st.caption("📚 จัดทำเพื่อประกอบการเรียนวิชา Machine Learning • 🛠️ พัฒนาด้วย Python, scikit-learn, Streamlit")
 
 # ================================================================
-#      👤 หน้าผู้พัฒนา (กึ่งกลางสมบูรณ์ + รูปวงกลมชัวร์)
+#      👤 หน้าผู้พัฒนา
 # ================================================================
 else:
     st.markdown("""
     <style>
-    /* ✅ บังคับรูปวงกลมสมส่วนด้วย !important (กัน Streamlit ทับ) */
     img {
-        display: block !important;
-        margin: 0 auto !important;
-        aspect-ratio: 1 / 1 !important;
-        object-fit: cover !important;
-        object-position: center top !important;
-        border-radius: 50% !important;
+        display: block !important; margin: 0 auto !important; aspect-ratio: 1 / 1 !important;
+        object-fit: cover !important; object-position: center top !important; border-radius: 50% !important;
         border: 5px solid transparent !important;
-        background: linear-gradient(#212B3B, #212B3B) padding-box,
-                    linear-gradient(135deg, #39FF14, #6A3AB2) border-box !important;
-        box-shadow: 0 0 40px rgba(57, 255, 20, .4) !important;
-        transition: all 0.3s ease;
+        background: linear-gradient(#212B3B, #212B3B) padding-box, linear-gradient(135deg, #39FF14, #6A3AB2) border-box !important;
+        box-shadow: 0 0 40px rgba(57, 255, 20, .4) !important; transition: all 0.3s ease;
     }
-    img:hover {
-        transform: scale(1.03);
-        box-shadow: 0 0 50px rgba(57, 255, 20, .6) !important;
-    }
-
+    img:hover { transform: scale(1.03); box-shadow: 0 0 50px rgba(57, 255, 20, .6) !important; }
     .dev-head { text-align: center; margin-top: 1rem; }
     .dev-title {
         font-size: 2.6rem; font-weight: 800;
@@ -428,15 +523,12 @@ else:
         text-shadow: 0 0 24px rgba(57, 255, 20, .25);
     }
     .dev-sub { color: #93A1B8; letter-spacing: 1px; font-size: .95rem; margin-top: .3rem; }
-
     .dev-avatar {
         width: 240px; height: 240px; border-radius: 50%; margin: 0 auto;
         background: linear-gradient(135deg, rgba(57,255,20,.25), rgba(106,58,178,.4));
-        border: 5px solid #6A3AB2;
-        display: flex; align-items: center; justify-content: center;
+        border: 5px solid #6A3AB2; display: flex; align-items: center; justify-content: center;
         font-size: 5rem; box-shadow: 0 0 40px rgba(57,255,20,.4);
     }
-
     .dev-name { text-align: center; font-size: 1.35rem; font-weight: 700; color: #F2F5FB; margin: .3rem 0 1rem 0; }
     .info-row {
         display: flex; justify-content: space-between; gap: 1rem;
@@ -456,7 +548,6 @@ else:
     </style>
     """, unsafe_allow_html=True)
 
-    # ✅ จัดทั้งหน้ากึ่งกลางด้วยคอลัมน์
     _, mid, _ = st.columns([1, 2.2, 1])
     with mid:
         st.markdown("""
@@ -466,7 +557,6 @@ else:
         </div>
         """, unsafe_allow_html=True)
 
-        # ✅ จัดรูปกึ่งกลางด้วยคอลัมน์ซ้อน (ชัวร์กว่า margin auto)
         if PHOTO:
             c1, c2, c3 = st.columns([1, 1.2, 1])
             with c2:
